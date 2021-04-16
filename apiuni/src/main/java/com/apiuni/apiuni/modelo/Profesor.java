@@ -1,7 +1,5 @@
 package com.apiuni.apiuni.modelo;
 
-import java.util.Set;
-
 import javax.persistence.*;
 
 
