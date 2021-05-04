@@ -1,6 +1,9 @@
 package com.apiuni.apiuni.modelo;
 
+import java.util.List;
+
 import javax.persistence.*;
+
 
 
 @Entity
@@ -12,12 +15,14 @@ public class Profesor {
 	private Long id;
 	
 	private String nombre;
-	private String apellidos;
     private String email;
-    private Integer telefono;
+    private String telefono;
     
     @ManyToOne
     private Departamento departamento;
+    
+    @ManyToMany
+	private List<Asignatura> asignaturas;
     
 	public Long getId() {
 		return id;
@@ -31,22 +36,17 @@ public class Profesor {
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
-	public String getApellidos() {
-		return apellidos;
-	}
-	public void setApellidos(String apellidos) {
-		this.apellidos = apellidos;
-	}
+	
 	public String getEmail() {
 		return email;
 	}
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	public Integer getTelefono() {
+	public String getTelefono() {
 		return telefono;
 	}
-	public void setTelefono(Integer telefono) {
+	public void setTelefono(String telefono) {
 		this.telefono = telefono;
 	}
 	public Departamento getDepartamento() {
@@ -54,6 +54,12 @@ public class Profesor {
 	}
 	public void setDepartamento(Departamento departamento) {
 		this.departamento = departamento;
+	}
+	public List<Asignatura> getAsignaturas() {
+		return asignaturas;
+	}
+	public void setAsignaturas(List<Asignatura> asignaturas) {
+		this.asignaturas = asignaturas;
 	}
 
     

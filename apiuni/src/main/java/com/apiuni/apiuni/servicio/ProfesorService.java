@@ -1,6 +1,7 @@
 package com.apiuni.apiuni.servicio;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,6 +49,11 @@ public class ProfesorService {
 	        }catch(Exception err){
 	            return false;
 	        }
+	}
+	
+	public void saveAll(Set<Profesor> profesores) {
+		
+		this.profesorRepository.saveAll(profesores);
 	}
 
 }

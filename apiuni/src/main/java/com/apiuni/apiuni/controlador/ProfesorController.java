@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.apiuni.apiuni.modelo.ErrorObject;
 import com.apiuni.apiuni.modelo.Profesor;
 import com.apiuni.apiuni.repositorio.DepartamentoRepository;
+import com.apiuni.apiuni.servicio.DepartamentoService;
 import com.apiuni.apiuni.servicio.ProfesorService;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -33,7 +34,7 @@ public class ProfesorController {
 	ProfesorService profesorService;
 
 	@Autowired
-	DepartamentoRepository departamentoRepository;
+	DepartamentoService departamentoService;
 
 	@Operation(summary = "Obtener profesores", description = "Esta operacion devuelve todoslos profesores de la pagina web", tags = "Profesor")
 	@ApiResponses(value = {
@@ -58,14 +59,20 @@ public class ProfesorController {
 	@PostMapping(path = "/añadir", consumes = "application/json")
 	public String guardarprofesor(@RequestBody Profesor p) {
 
-		if (departamentoRepository.findById(p.getDepartamento().getId()).isEmpty()) {
+		if(p.getDepartamento()!=null) {
+		
+		if (departamentoService.findById(p.getDepartamento().getId())== null) {
 			p.setDepartamento(null);
 			this.profesorService.guardaProfesor(p);
-			return "No se ha encontrado el departamento, se ha creado el profesor con Departamento = null";
-
+			return "No se ha encontrado el departamento, se ha creado el profesor con Departamento = null";}
+		else {
+			this.profesorService.guardaProfesor(p);
+			return "Se ha creado el profesor con departamento = " + p.getDepartamento().getNombre();
+		}
+		
 		} else {
 			this.profesorService.guardaProfesor(p);
-			return "Se ha añadido correctamente el profesor con id: " + p.getId();
+			return "Se ha añadido correctamente el profesor ";
 		}
 
 	}
@@ -88,34 +95,5 @@ public class ProfesorController {
 
 	}
 
-//	@SuppressWarnings("unused")
-//	private ResponseEntity<?> noEncontrado() {
-//		return new ResponseEntity<>(
-//				new ErrorObject(HttpStatus.NOT_FOUND.toString(), "No se ha encontrado en la base de datos"),
-//				HttpStatus.NOT_FOUND);
-//	}
 
-//	@SuppressWarnings("unused")
-//	private ResponseEntity<?> solicitudIncorrecta(Throwable throwable) {
-//		return new ResponseEntity<>(new ErrorObject(HttpStatus.BAD_REQUEST.toString(), "Solicitud incorrecta"),
-//				HttpStatus.BAD_REQUEST);
-//	}
-//
-//	@SuppressWarnings("unused")
-//	private ResponseEntity<?> conflicto() {
-//		return new ResponseEntity<>(
-//				new ErrorObject(HttpStatus.CONFLICT.toString(), "Ya existe ese objeto en la base de datos"),
-//				HttpStatus.CONFLICT);
-//	}
-//	@GetMapping(path = "/create")
-//	public String creaProfesor() {
-//
-//		Profesor p = new Profesor();
-//		p.setNombre("Alvaro");
-//		p.setApellidos("Gomez Perez");
-//		p.setEmail("alvaro@gmail.com");
-//		p.setTelefono(654321234);
-//		this.profesorService.guardaProfesor(p);
-//		return "Se creó el profesor correctamente";
-//	}
 }

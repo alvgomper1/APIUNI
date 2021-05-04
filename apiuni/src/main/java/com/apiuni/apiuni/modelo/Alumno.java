@@ -13,14 +13,17 @@ import javax.persistence.ManyToMany;
 public class Alumno {
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(unique = true, nullable = false)
 	private Long id;
 	
 	private String nombre;
 	private String apellidos;
+	private Integer edad;
     private String email;
-    private Integer telefono;
+    
+    private String telefono;
+    
     
     @ManyToMany(mappedBy = "alumnos")
     private Set<Asignatura> asignaturas;
@@ -57,12 +60,12 @@ public class Alumno {
 		this.email = email;
 	}
 
-	public Integer getTelefono() {
-		return telefono;
+	public Integer getEdad() {
+		return edad;
 	}
 
-	public void setTelefono(Integer telefono) {
-		this.telefono = telefono;
+	public void setEdad(Integer edad) {
+		this.edad = edad;
 	}
 
 	public Set<Asignatura> getAsignaturas() {
@@ -71,6 +74,14 @@ public class Alumno {
 
 	public void setAsignaturas(Set<Asignatura> asignaturas) {
 		this.asignaturas = asignaturas;
+	}
+
+	public String getTelefono() {
+		return telefono;
+	}
+
+	public void setTelefono(String telefono) {
+		this.telefono = telefono;
 	}
     
     

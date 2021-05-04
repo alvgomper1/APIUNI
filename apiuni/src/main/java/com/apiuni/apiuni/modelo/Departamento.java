@@ -1,25 +1,40 @@
 package com.apiuni.apiuni.modelo;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 
 @Entity
 public class Departamento {
 	
 	
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(unique = true, nullable = false)
+	private Long id;
 	
-    private Long id;
 	private String nombre;
 	
-	@OneToMany
+	private String sede;
+	
+	private String email;
+	
+	private String telefono;
+	
+	private String web;
+	
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "departamento")
+	private Set<Asignatura> asignaturas;
+	
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "departamento")
 	private Set<Profesor> profesores;
 	
-	@OneToMany
-	private Set<Asignatura> asignaturas;
+	
+	
 	
 	public Long getId() {
 		return id;
@@ -44,6 +59,30 @@ public class Departamento {
 	}
 	public void setAsignaturas(Set<Asignatura> asignaturas) {
 		this.asignaturas = asignaturas;
+	}
+	public String getSede() {
+		return sede;
+	}
+	public void setSede(String sede) {
+		this.sede = sede;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	public String getTelefono() {
+		return telefono;
+	}
+	public void setTelefono(String telefono) {
+		this.telefono = telefono;
+	}
+	public String getWeb() {
+		return web;
+	}
+	public void setWeb(String web) {
+		this.web = web;
 	}
 
 	
