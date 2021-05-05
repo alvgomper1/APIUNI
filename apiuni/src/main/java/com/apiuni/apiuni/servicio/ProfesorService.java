@@ -14,6 +14,10 @@ import com.apiuni.apiuni.repositorio.ProfesorRepository;
 public class ProfesorService {
 	@Autowired
 	ProfesorRepository profesorRepository;
+	
+	public long saveId(Profesor p) {
+		return this.profesorRepository.save(p).getId();
+	}
 
 	public List<Profesor> obtenerProfesores() {
 		return (List<Profesor>) this.profesorRepository.findAll();

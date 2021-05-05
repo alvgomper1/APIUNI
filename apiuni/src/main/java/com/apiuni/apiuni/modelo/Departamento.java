@@ -1,11 +1,8 @@
 package com.apiuni.apiuni.modelo;
 
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.*;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
 
 
 @Entity

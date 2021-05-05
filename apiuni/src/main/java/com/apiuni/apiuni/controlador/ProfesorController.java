@@ -1,10 +1,7 @@
 package com.apiuni.apiuni.controlador;
 
-import java.util.List;
-
+ 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,15 +12,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.apiuni.apiuni.modelo.ErrorObject;
 import com.apiuni.apiuni.modelo.Profesor;
-import com.apiuni.apiuni.repositorio.DepartamentoRepository;
+import com.apiuni.apiuni.servicio.AsignaturaService;
 import com.apiuni.apiuni.servicio.DepartamentoService;
 import com.apiuni.apiuni.servicio.ProfesorService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import netscape.javascript.JSObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 @RestController
@@ -31,7 +30,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 public class ProfesorController {
 
 	@Autowired
+	private ObjectMapper objectMapper;
+
+	@Autowired
 	ProfesorService profesorService;
+	
+	@Autowired
+	AsignaturaService asignaturaService;
 
 	@Autowired
 	DepartamentoService departamentoService;
@@ -45,8 +50,9 @@ public class ProfesorController {
 			@ApiResponse(responseCode = "404", description = "No disponible", content = @Content),
 			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(schema = @Schema(implementation = ErrorObject.class))) })
 	@GetMapping()
-	public List<Profesor> obtenerprofesores() {
-		return this.profesorService.obtenerProfesores();
+	public String obtenerprofesores() throws JsonProcessingException {
+		return objectMapper.writeValueAsString(this.profesorService.obtenerProfesores());
+
 	}
 
 	@Operation(summary = "Crear profesor", description = "Esta operacion crea un nuevo profesor y lo inserta en la base de datos", tags = "Profesor")
@@ -57,22 +63,36 @@ public class ProfesorController {
 
 			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(schema = @Schema(implementation = ErrorObject.class))) })
 	@PostMapping(path = "/añadir", consumes = "application/json")
-	public String guardarprofesor(@RequestBody Profesor p) {
-
-		if(p.getDepartamento()!=null) {
+	public String guardarprofesor(@RequestBody Profesor p) throws JsonProcessingException {
 		
-		if (departamentoService.findById(p.getDepartamento().getId())== null) {
-			p.setDepartamento(null);
-			this.profesorService.guardaProfesor(p);
-			return "No se ha encontrado el departamento, se ha creado el profesor con Departamento = null";}
+		if (  asignaturaService.existen(p.getAsignaturas())) {
+			
+		}
 		else {
-			this.profesorService.guardaProfesor(p);
-			return "Se ha creado el profesor con departamento = " + p.getDepartamento().getNombre();
+			p.setAsignaturas(null);
 		}
 		
+		
+
+		if (p.getDepartamento() != null) {
+
+			if (departamentoService.findById(p.getDepartamento().getId()) == null) {
+				p.setDepartamento(null);
+				long id = this.profesorService.saveId(p);
+				return "No se ha encontrado el departamento, se ha creado el profesor con Departamento = null. Resultado: "
+						+ objectMapper.writeValueAsString(this.profesorService.obtenerProfesorPorId(id));
+			} else {
+				long id = this.profesorService.saveId(p);
+				;
+				return "Se ha creado el profesor con departamento = " + p.getDepartamento().getNombre()
+						+ ". Resultado: "
+						+ objectMapper.writeValueAsString(this.profesorService.obtenerProfesorPorId(id));
+			}
+
 		} else {
-			this.profesorService.guardaProfesor(p);
-			return "Se ha añadido correctamente el profesor ";
+			long id = this.profesorService.saveId(p);
+			return "Se ha añadido correctamente el profesor " + ". Resultado: "
+					+ objectMapper.writeValueAsString(this.profesorService.obtenerProfesorPorId(id));
 		}
 
 	}
@@ -94,6 +114,5 @@ public class ProfesorController {
 		}
 
 	}
-
 
 }

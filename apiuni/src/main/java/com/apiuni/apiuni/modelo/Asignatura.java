@@ -34,7 +34,7 @@ public class Asignatura {
 
 	
 	@JoinTable(name = "rel_asig_prof", joinColumns = @JoinColumn(name = "FK_ASIGANTURA"), inverseJoinColumns = @JoinColumn(name = "FK_PROFESOR"))
-	@ManyToMany()
+	@ManyToMany
 	private List<Profesor> profesores;
 	
 	@ManyToMany(cascade = CascadeType.ALL)
