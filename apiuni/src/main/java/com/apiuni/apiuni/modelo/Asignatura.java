@@ -33,7 +33,6 @@ public class Asignatura {
 	private Departamento departamento;
 
 	
-	@JoinTable(name = "rel_asig_prof", joinColumns = @JoinColumn(name = "FK_ASIGANTURA"), inverseJoinColumns = @JoinColumn(name = "FK_PROFESOR"))
 	@ManyToMany
 	private List<Profesor> profesores;
 	

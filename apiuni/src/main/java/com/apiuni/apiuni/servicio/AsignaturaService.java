@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.apiuni.apiuni.modelo.Asignatura;
+import com.apiuni.apiuni.modelo.Departamento;
 import com.apiuni.apiuni.repositorio.AsignaturaRepository;
  
 @Service
@@ -36,6 +37,13 @@ public boolean existen(List<Asignatura> asignaturas) {
 			return false;
 		}
 	}
+
+public List<Asignatura> findAllAsignaturas (){
+	return (List<Asignatura>) this.asignaturarepository.findAll();
+}
 	
+public long saveId(Asignatura d) {
+	return this.asignaturarepository.save(d).getId();
+}
 	
 }
