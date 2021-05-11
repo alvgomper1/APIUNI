@@ -21,7 +21,7 @@ public class Profesor {
     @ManyToOne
     private Departamento departamento;
     
-    @ManyToMany
+    @ManyToMany(mappedBy = "profesores")
 	private List<Asignatura> asignaturas;
     
 	public Long getId() {

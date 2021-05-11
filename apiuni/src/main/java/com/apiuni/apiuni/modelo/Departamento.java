@@ -5,6 +5,8 @@ import java.util.Set;
 import javax.persistence.*;
 
 
+
+
 @Entity
 public class Departamento {
 	
