@@ -35,11 +35,11 @@ public class Asignatura {
 	private Departamento departamento;
 
 	
-	@ManyToMany
+	@ManyToMany(cascade = CascadeType.ALL)
 	private List<Profesor> profesores;
 	
-	@OneToMany(cascade = CascadeType.ALL)	
-
+	 
+	@OneToMany
 	private Set<Alumno> alumnos;
 
 	public Long getId() {

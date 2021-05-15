@@ -85,7 +85,7 @@ public class ProfesorController {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject.class))) }),
 			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(schema = @Schema(implementation = ErrorObject.class))) })
 	@PostMapping(path = "/añadir", consumes = "application/json")
-	public ResponseEntity<Profesor> guardarprofesor(@RequestBody Profesor p)   {
+	public ResponseEntity<Profesor> guardarprofesor(@RequestBody Profesor p) {
 
 		if (asignaturaService.existen(p.getAsignaturas())) {
 
@@ -101,7 +101,7 @@ public class ProfesorController {
 				return new ResponseEntity<Profesor>(HttpStatus.ACCEPTED);
 			} else {
 				this.profesorService.saveId(p);
-				;
+
 				return new ResponseEntity<Profesor>(HttpStatus.ACCEPTED);
 			}
 

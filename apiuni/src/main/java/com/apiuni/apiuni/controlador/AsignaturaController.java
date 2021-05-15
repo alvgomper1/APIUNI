@@ -1,6 +1,8 @@
 package com.apiuni.apiuni.controlador;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -71,10 +73,11 @@ public class AsignaturaController {
 			@ApiResponse(responseCode = "200", description = "Se ha ejecutado la consulta correctamente", content = {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = Asignatura.class))) }),
 			@ApiResponse(responseCode = "500", description = "No se ha podido crear la Asignatura porque se añadieron atributos que no estan creados en la base de datos", content = @Content),
-
+			@ApiResponse(responseCode = "404", description = "No se ha encontrado la asignatura con ese id", content = {
+					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject.class))) }),
 			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(schema = @Schema(implementation = ErrorObject.class))) })
 	@PostMapping(path = "/añadir", consumes = "application/json")
-	public String guardarAsignatura(@RequestBody Asignatura d) throws JsonProcessingException {
+	public ResponseEntity<Asignatura> guardarAsignatura(@RequestBody Asignatura d) throws JsonProcessingException {
 
 		boolean prof = d.getProfesores().stream()
 				.filter(x -> this.profesorService.obtenerProfesorPorId(x.getId()) == null).count() != 0;
@@ -102,36 +105,37 @@ public class AsignaturaController {
 			}
 			Long id = this.asignaturaService.saveId(d);
 
-			return objectMapper.writeValueAsString(this.asignaturaService.findById(id));
+			return new ResponseEntity<Asignatura>(HttpStatus.ACCEPTED);
 
 		} else {
 			Long id = this.asignaturaService.saveId(d);
 
-			return objectMapper.writeValueAsString(this.asignaturaService.findById(id));
+			return new ResponseEntity<Asignatura>(HttpStatus.ACCEPTED);
 		}
 	}
-	
+
 	@Operation(summary = "Borrar Asignatura", description = "Esta operacion permite eliminar una asignatura introduciendo como parametro su identificador (id)", tags = "Asignatura")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "Se ha borrado la asignatura de la base de datos correctamente", content = {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = Asignatura.class))) }),
-			@ApiResponse(responseCode = "404", description = "No disponible", content = @Content),
+			@ApiResponse(responseCode = "404", description = "No se ha encontrado la asignatura con ese id", content = {
+					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject.class))) }),
 			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(schema = @Schema(implementation = ErrorObject.class))) })
 
 	@DeleteMapping(path = "/eliminar/{id}")
-	public String eliminarPorId(@PathVariable("id") Long id) {
-		
-		if(this.asignaturaService.findById(id)==null) {
-			return "No existe una asignatura con el id " + id;
-			
-		}else {
-		
-		boolean ok = this.asignaturaService.eliminaAsignaturaPorId(id);
-		if (ok) {
-			return "Se eliminó la asignatura con id " + id;
+	public ResponseEntity<Asignatura> eliminarPorId(@PathVariable("id") Long id) {
+
+		if (this.asignaturaService.findById(id) == null) {
+			return new ResponseEntity<Asignatura>(HttpStatus.NOT_FOUND);
+
 		} else {
-			return "No pudo eliminar la asignatura con id " + id;
-		}
+
+			boolean ok = this.asignaturaService.eliminaAsignaturaPorId(id);
+			if (ok) {
+				return new ResponseEntity<Asignatura>(HttpStatus.ACCEPTED);
+			} else {
+				return new ResponseEntity<Asignatura>(HttpStatus.NOT_FOUND);
+			}
 		}
 	}
 
@@ -140,21 +144,22 @@ public class AsignaturaController {
 			@ApiResponse(responseCode = "200", description = "Se ha ejecutado la consulta correctamente", content = {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = Asignatura.class))) }),
 			@ApiResponse(responseCode = "500", description = "No se ha podido añadir el alumno", content = @Content),
-
+			@ApiResponse(responseCode = "404", description = "No se ha encontrado la asignatura con ese id", content = {
+					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject.class))) }),
 			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(schema = @Schema(implementation = ErrorObject.class))) })
 	@PutMapping("{id}/añadirAlumno")
-	public String anadeAlumnoAsignatura(@PathVariable("id") final long id, @RequestBody final Alumno a)
-			throws JsonProcessingException {
+	public ResponseEntity<Asignatura> anadeAlumnoAsignatura(@PathVariable("id") final long id,
+			@RequestBody final Alumno a) throws JsonProcessingException {
 
 		Asignatura asig = asignaturaService.findById(id);
 		if (asig == null) {
-			return "No se ha encontrado la asignatura con ese id en la base de datos";
+			return new ResponseEntity<Asignatura>(HttpStatus.NOT_FOUND);
 		} else {
 			asig.getAlumnos().add(a);
 
 			alumnosService.save(a);
 			asignaturaService.saveId(asig);
-			return "Se ha añadido el siguiente alumno a la asignatura: \n" + objectMapper.writeValueAsString(a);
+			return new ResponseEntity<Asignatura>(HttpStatus.ACCEPTED);
 		}
 
 	}
@@ -164,19 +169,20 @@ public class AsignaturaController {
 			@ApiResponse(responseCode = "200", description = "Se ha ejecutado la consulta correctamente", content = {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = Asignatura.class))) }),
 			@ApiResponse(responseCode = "500", description = "No se ha podido añadir el alumno", content = @Content),
-
+			@ApiResponse(responseCode = "404", description = "No se ha encontrado la asignatura o el alumno con ese id", content = {
+					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject.class))) }),
 			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(schema = @Schema(implementation = ErrorObject.class))) })
 	@PutMapping("{id}/añadirAlumno/{idAlumno}")
-	public String anadeAlumnoAsignaturaPorId(@PathVariable("id") final long id,
+	public ResponseEntity<Asignatura> anadeAlumnoAsignaturaPorId(@PathVariable("id") final long id,
 			@PathVariable("idAlumno") final long idAlumno) throws JsonProcessingException {
 
 		Asignatura asig = asignaturaService.findById(id);
 		Alumno alum = alumnosService.findAlumnoById(idAlumno);
 		if (asig == null) {
-			return "No se ha encontrado la asignatura con ese id en la base de datos";
+			return new ResponseEntity<Asignatura>(HttpStatus.NOT_FOUND);
 		} else {
 			if (alum == null) {
-				return "No se ha encontrado el alumno con ese id en la base de datos";
+				return new ResponseEntity<Asignatura>(HttpStatus.NOT_FOUND);
 			} else {
 
 			}
@@ -184,7 +190,7 @@ public class AsignaturaController {
 			asig.getAlumnos().add(alum);
 
 			asignaturaService.saveId(asig);
-			return "Se ha añadido el siguiente alumno a la asignatura: \n" + objectMapper.writeValueAsString(alum);
+			return new ResponseEntity<Asignatura>(HttpStatus.ACCEPTED);
 		}
 
 	}

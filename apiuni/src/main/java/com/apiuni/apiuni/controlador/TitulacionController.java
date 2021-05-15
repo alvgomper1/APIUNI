@@ -1,7 +1,8 @@
 package com.apiuni.apiuni.controlador;
 
- 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.apiuni.apiuni.modelo.Departamento;
 import com.apiuni.apiuni.modelo.ErrorObject;
+import com.apiuni.apiuni.modelo.Profesor;
 import com.apiuni.apiuni.modelo.Titulacion;
 import com.apiuni.apiuni.servicio.AsignaturaService;
 import com.apiuni.apiuni.servicio.TitulacionService;
@@ -38,7 +40,7 @@ public class TitulacionController {
 	@Autowired
 	private ObjectMapper objectMapper;
 
-	@Operation(summary = "Obtener titulaciones", description = "Esta operacion devuelve todas las titulaciones de la pagina web", tags = "Titulacion")
+	@Operation(summary = "Obtener titulaciones", description = "Esta operacion devuelve todas las titulaciones de la pagina web", tags = "Titulación")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "Se han obtenido todos los resultados de titulaciones de la base de datos correctamente", content = {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = Titulacion.class)),
@@ -52,15 +54,16 @@ public class TitulacionController {
 		return objectMapper.writeValueAsString(this.titulacionService.findAll());
 	}
 
-	@Operation(summary = "Crear Titulacion", description = "Esta operacion crea una nueva Titulacion y la inserta en la base de datos", tags = "Titulacion")
+	@Operation(summary = "Crear Titulacion", description = "Esta operacion crea una nueva Titulacion y la inserta en la base de datos", tags = "Titulación")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "Se ha creado la Titulacion y se ha insertado en la base de datos correctamente", content = {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = Titulacion.class))) }),
 			@ApiResponse(responseCode = "500", description = "No se ha podido crear la Titulacion porque se añadieron atributos que no estan creados en la base de datos", content = @Content),
-
+			@ApiResponse(responseCode = "404", description = "No se ha encontrado la titulacion con ese id", content = {
+					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject.class))) }),
 			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(schema = @Schema(implementation = ErrorObject.class))) })
 	@PostMapping(path = "/añadir", consumes = "application/json")
-	public String guardarTitulacion(@RequestBody Titulacion t) throws JsonProcessingException {
+	public ResponseEntity<Titulacion> guardarTitulacion(@RequestBody Titulacion t) throws JsonProcessingException {
 
 		if (t.getAsignaturas() != null) {
 
@@ -68,49 +71,46 @@ public class TitulacionController {
 
 				t.setAsignaturas(t.getAsignaturas());
 
-				long id = this.titulacionService.saveId(t);
-				return "No se ha encontrado el departamento, se ha creado el profesor con Departamento = null. Resultado: "
-						+ objectMapper.writeValueAsString(this.titulacionService.findById(id));
+				this.titulacionService.saveId(t);
+				return new ResponseEntity<Titulacion>(HttpStatus.ACCEPTED);
 			} else {
 				t.setAsignaturas(null);
-				long id = this.titulacionService.saveId(t);				 
-				return "No se han encontrado las asignaturas, la titulacion se ha guardado sin ninguna. Resultado: "
-						+ objectMapper.writeValueAsString(this.titulacionService.findById(id));
+				this.titulacionService.saveId(t);
+				return new ResponseEntity<Titulacion>(HttpStatus.ACCEPTED);
 			}
 
 		}
 
 		else {
-			long id = this.titulacionService.saveId(t);
-			return "Se ha añadido correctamente la titulacion " + ". Resultado: "
-					+ objectMapper.writeValueAsString(this.titulacionService.findById(id));
+			this.titulacionService.saveId(t);
+			return new ResponseEntity<Titulacion>(HttpStatus.ACCEPTED);
 
 		}
 
-		 
 	}
-	
+
 	@Operation(summary = "Borrar Titulación", description = "Esta operacion permite eliminar una Titulación introduciendo como parametro su identificador (id)", tags = "Titulación")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "Se ha borrado el Titulación de la base de datos correctamente", content = {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = Titulacion.class))) }),
-			@ApiResponse(responseCode = "404", description = "No disponible", content = @Content),
+			@ApiResponse(responseCode = "404", description = "No se ha encontrado la titulacion con ese id", content = {
+					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject.class))) }),
 			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(schema = @Schema(implementation = ErrorObject.class))) })
 
 	@DeleteMapping(path = "/eliminar/{id}")
-	public String eliminarPorId(@PathVariable("id") Long id) {
-		
-		if(this.titulacionService.findById(id)==null) {
-			return "No existe una Titulación con el id " + id;
-			
-		}else {
-		
-		boolean ok = this.titulacionService.eliminaTitulacionPorId(id);
-		if (ok) {
-			return "Se eliminó la Titulación con id " + id;
+	public ResponseEntity<Titulacion> eliminarPorId(@PathVariable("id") Long id) {
+
+		if (this.titulacionService.findById(id) == null) {
+			return new ResponseEntity<Titulacion>(HttpStatus.NOT_FOUND);
+
 		} else {
-			return "No pudo eliminar la Titulación con id " + id;
-		}
+
+			boolean ok = this.titulacionService.eliminaTitulacionPorId(id);
+			if (ok) {
+				return new ResponseEntity<Titulacion>(HttpStatus.ACCEPTED);
+			} else {
+				return new ResponseEntity<Titulacion>(HttpStatus.NOT_FOUND);
+			}
 		}
 	}
 
