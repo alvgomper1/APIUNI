@@ -9,8 +9,16 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 
+import io.swagger.v3.oas.annotations.Parameter;
+
+ 
+
 @Entity
 public class Alumno {
+	
+	  
+	  
+	  
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -25,8 +33,7 @@ public class Alumno {
     private String telefono;
     
     
-    @ManyToMany(mappedBy = "alumnos")
-    private Set<Asignatura> asignaturas;
+
 
 	public Long getId() {
 		return id;
@@ -68,13 +75,8 @@ public class Alumno {
 		this.edad = edad;
 	}
 
-	public Set<Asignatura> getAsignaturas() {
-		return asignaturas;
-	}
-
-	public void setAsignaturas(Set<Asignatura> asignaturas) {
-		this.asignaturas = asignaturas;
-	}
+	
+	 
 
 	public String getTelefono() {
 		return telefono;

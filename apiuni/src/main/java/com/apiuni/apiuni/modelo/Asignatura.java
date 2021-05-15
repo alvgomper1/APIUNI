@@ -38,10 +38,8 @@ public class Asignatura {
 	@ManyToMany
 	private List<Profesor> profesores;
 	
-	@ManyToMany
-	@JoinTable(name = "asignatura_alumno",
-    joinColumns = @JoinColumn(name = "asignatura_id", referencedColumnName = "id"),
-    inverseJoinColumns = @JoinColumn(name = "alumno_id", referencedColumnName = "id"))
+	@OneToMany(cascade = CascadeType.ALL)	
+
 	private Set<Alumno> alumnos;
 
 	public Long getId() {
