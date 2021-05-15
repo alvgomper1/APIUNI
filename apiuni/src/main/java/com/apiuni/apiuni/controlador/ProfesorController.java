@@ -1,7 +1,10 @@
 package com.apiuni.apiuni.controlador;
 
- 
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.apiuni.apiuni.modelo.Alumno;
 import com.apiuni.apiuni.modelo.ErrorObject;
 import com.apiuni.apiuni.modelo.Profesor;
 import com.apiuni.apiuni.servicio.AsignaturaService;
@@ -34,20 +38,21 @@ public class ProfesorController {
 
 	@Autowired
 	ProfesorService profesorService;
-	
+
 	@Autowired
 	AsignaturaService asignaturaService;
 
 	@Autowired
 	DepartamentoService departamentoService;
 
-	@Operation(summary = "Obtener profesores", description = "Esta operacion devuelve todoslos profesores de la pagina web", tags = "Profesor")
+	@Operation(summary = "Obtener profesores", description = "Esta operacion devuelve todos los profesores de la pagina web", tags = "Profesor")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "Se han obtenido todos los resultados de profesores de la base de datos correctamente", content = {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = Profesor.class)),
 
 							mediaType = "application/json") }),
-			@ApiResponse(responseCode = "404", description = "No disponible", content = @Content),
+			@ApiResponse(responseCode = "404", description = "No se ha encontrado el profesor con ese id", content = {
+					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject.class))) }),
 			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(schema = @Schema(implementation = ErrorObject.class))) })
 	@GetMapping()
 	public String obtenerprofesores() throws JsonProcessingException {
@@ -55,44 +60,54 @@ public class ProfesorController {
 
 	}
 
+	@Operation(summary = "Obtener profesores por nombre", description = "Esta operacion devuelve todos los profesores de la pagina web que tengan el nombre introducido como parametro", tags = "Profesor")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "Se han obtenido todos los resultados de profesores de la base de datos correctamente", content = {
+					@Content(array = @ArraySchema(schema = @Schema(implementation = Profesor.class)),
+
+							mediaType = "application/json") }),
+			@ApiResponse(responseCode = "404", description = "No se ha encontrado el profesor con ese id", content = {
+					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject.class))) }),
+			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(schema = @Schema(implementation = ErrorObject.class))) })
+	@GetMapping("{nombre}")
+	public String obtenerProfesorPorNombre(@PathVariable("nombre") final String nombre) throws JsonProcessingException {
+		return objectMapper.writeValueAsString(this.profesorService.obtenerProfesores().stream()
+				.filter(x -> x.getNombre().startsWith(nombre.toUpperCase())).collect(Collectors.toList()));
+
+	}
+
 	@Operation(summary = "Crear profesor", description = "Esta operacion crea un nuevo profesor y lo inserta en la base de datos", tags = "Profesor")
 	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "Se hacreado el profesor y se ha insertado en la base de datos correctamente", content = {
+			@ApiResponse(responseCode = "200", description = "Se ha ejecutado la consulta correctamente", content = {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = Profesor.class))) }),
 			@ApiResponse(responseCode = "500", description = "No se ha podido crear el profesor porque se añadieron atributos que no estan creados en la base de datos", content = @Content),
-
+			@ApiResponse(responseCode = "404", description = "No se ha encontrado el profesor con ese id", content = {
+					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject.class))) }),
 			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(schema = @Schema(implementation = ErrorObject.class))) })
 	@PostMapping(path = "/añadir", consumes = "application/json")
-	public String guardarprofesor(@RequestBody Profesor p) throws JsonProcessingException {
-		
-		if (  asignaturaService.existen(p.getAsignaturas())) {
-			
-		}
-		else {
+	public ResponseEntity<Profesor> guardarprofesor(@RequestBody Profesor p)   {
+
+		if (asignaturaService.existen(p.getAsignaturas())) {
+
+		} else {
 			p.setAsignaturas(null);
 		}
-		
-		
 
 		if (p.getDepartamento() != null) {
 
 			if (departamentoService.findById(p.getDepartamento().getId()) == null) {
 				p.setDepartamento(null);
-				long id = this.profesorService.saveId(p);
-				return "No se ha encontrado el departamento, se ha creado el profesor con Departamento = null. Resultado: "
-						+ objectMapper.writeValueAsString(this.profesorService.obtenerProfesorPorId(id));
+				this.profesorService.saveId(p);
+				return new ResponseEntity<Profesor>(HttpStatus.ACCEPTED);
 			} else {
-				long id = this.profesorService.saveId(p);
+				this.profesorService.saveId(p);
 				;
-				return "Se ha creado el profesor con departamento = " + p.getDepartamento().getNombre()
-						+ ". Resultado: "
-						+ objectMapper.writeValueAsString(this.profesorService.obtenerProfesorPorId(id));
+				return new ResponseEntity<Profesor>(HttpStatus.ACCEPTED);
 			}
 
 		} else {
-			long id = this.profesorService.saveId(p);
-			return "Se ha añadido correctamente el profesor " + ". Resultado: "
-					+ objectMapper.writeValueAsString(this.profesorService.obtenerProfesorPorId(id));
+			this.profesorService.saveId(p);
+			return new ResponseEntity<Profesor>(HttpStatus.ACCEPTED);
 		}
 
 	}
@@ -101,16 +116,19 @@ public class ProfesorController {
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "Se ha borrado el profesor de la base de datos correctamente", content = {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = Profesor.class))) }),
-			@ApiResponse(responseCode = "404", description = "No disponible", content = @Content),
+			@ApiResponse(responseCode = "404", description = "No se ha encontrado el profesor con ese id", content = {
+					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject.class))) }),
 			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(schema = @Schema(implementation = ErrorObject.class))) })
 
 	@DeleteMapping(path = "/eliminar/{id}")
-	public String eliminarPorId(@PathVariable("id") Long id) {
+	public ResponseEntity<Profesor> eliminarPorId(@PathVariable("id") Long id) {
 		boolean ok = this.profesorService.eliminaProfesorPorId(id);
 		if (ok) {
-			return "Se eliminó el profesor con id " + id;
+			return new ResponseEntity<Profesor>(HttpStatus.ACCEPTED);
+
 		} else {
-			return "No pudo eliminar el profesor con id " + id;
+			return new ResponseEntity<Profesor>(HttpStatus.NOT_FOUND);
+
 		}
 
 	}
