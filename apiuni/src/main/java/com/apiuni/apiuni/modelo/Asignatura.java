@@ -5,6 +5,9 @@ import java.util.Set;
 
 import javax.persistence.*;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 
 
 @Entity
@@ -29,7 +32,6 @@ public class Asignatura {
 	private Titulacion titulacion;
 
 	@ManyToOne
-	@JoinColumn(name = "departamento_id")
 	private Departamento departamento;
 
 	
@@ -37,6 +39,7 @@ public class Asignatura {
 	private List<Profesor> profesores;
 	
 	@OneToMany(cascade = CascadeType.ALL)	
+
 	private Set<Alumno> alumnos;
 
 	public Long getId() {
@@ -118,6 +121,7 @@ public class Asignatura {
 	public void setTitulacion(Titulacion titulacion) {
 		this.titulacion = titulacion;
 	}
+	
 	
 	
 

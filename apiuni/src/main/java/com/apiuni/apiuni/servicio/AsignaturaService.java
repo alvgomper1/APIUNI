@@ -45,5 +45,17 @@ public List<Asignatura> findAllAsignaturas (){
 public long saveId(Asignatura d) {
 	return this.asignaturarepository.save(d).getId();
 }
+
+public boolean eliminaAsignaturaPorId(Long idAsignatura) {
+	 try{
+           this.asignaturarepository.deleteById(idAsignatura);
+           return true;
+       }catch(Exception err){
+           return false;
+       }
+}
+public void saveAll(Set<Asignatura> asignaturas) {
+	this.asignaturarepository.saveAll(asignaturas);
+}
 	
 }

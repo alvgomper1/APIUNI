@@ -34,4 +34,13 @@ public class DepartamentoService {
 		return this.departamentoRepository.save(d).getId();
 	}
 	
+	public boolean eliminaDepartamentoPorId(Long idDepartamento) {
+		 try{
+	           this.departamentoRepository.deleteById(idDepartamento);
+	           return true;
+	       }catch(Exception err){
+	           return false;
+	       }
+	}
+	
 }
