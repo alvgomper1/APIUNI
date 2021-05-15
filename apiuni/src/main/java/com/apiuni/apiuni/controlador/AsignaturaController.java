@@ -1,7 +1,9 @@
 package com.apiuni.apiuni.controlador;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.apiuni.apiuni.modelo.Asignatura;
 import com.apiuni.apiuni.modelo.Departamento;
 import com.apiuni.apiuni.modelo.ErrorObject;
+import com.apiuni.apiuni.modelo.Profesor;
 import com.apiuni.apiuni.servicio.AlumnoService;
 import com.apiuni.apiuni.servicio.AsignaturaService;
 import com.apiuni.apiuni.servicio.DepartamentoService;
@@ -103,6 +106,30 @@ public class AsignaturaController {
 			Long id = this.asignaturaService.saveId(d);
 
 			return objectMapper.writeValueAsString(this.asignaturaService.findById(id));
+		}
+	}
+	
+	@Operation(summary = "Borrar Asignatura", description = "Esta operacion permite eliminar una asignatura introduciendo como parametro su identificador (id)", tags = "Asignatura")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "Se ha borrado la asignatura de la base de datos correctamente", content = {
+					@Content(array = @ArraySchema(schema = @Schema(implementation = Asignatura.class))) }),
+			@ApiResponse(responseCode = "404", description = "No disponible", content = @Content),
+			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(schema = @Schema(implementation = ErrorObject.class))) })
+
+	@DeleteMapping(path = "/eliminar/{id}")
+	public String eliminarPorId(@PathVariable("id") Long id) {
+		
+		if(this.asignaturaService.findById(id)==null) {
+			return "No existe una asignatura con el id " + id;
+			
+		}else {
+		
+		boolean ok = this.asignaturaService.eliminaAsignaturaPorId(id);
+		if (ok) {
+			return "Se eliminó la asignatura con id " + id;
+		} else {
+			return "No pudo eliminar la asignatura con id " + id;
+		}
 		}
 	}
 

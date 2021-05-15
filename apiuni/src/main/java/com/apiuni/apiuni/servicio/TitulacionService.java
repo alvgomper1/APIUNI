@@ -29,4 +29,13 @@ public class TitulacionService {
 		return titulacionRepository.findAll();
 	}
 	
+	public boolean eliminaTitulacionPorId(Long idTitulacion) {
+		 try{
+	           this.titulacionRepository.deleteById(idTitulacion);
+	           return true;
+	       }catch(Exception err){
+	           return false;
+	       }
+	}
+	
 }

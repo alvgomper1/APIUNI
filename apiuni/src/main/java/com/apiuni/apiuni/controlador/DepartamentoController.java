@@ -1,14 +1,23 @@
 package com.apiuni.apiuni.controlador;
 
+import java.util.List;
+import java.util.Set;
+
+import javax.persistence.EntityManager;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.apiuni.apiuni.modelo.Asignatura;
 import com.apiuni.apiuni.modelo.Departamento;
 import com.apiuni.apiuni.modelo.ErrorObject;
+import com.apiuni.apiuni.modelo.Profesor;
 import com.apiuni.apiuni.servicio.AsignaturaService;
 import com.apiuni.apiuni.servicio.DepartamentoService;
 import com.apiuni.apiuni.servicio.ProfesorService;
@@ -106,4 +115,32 @@ public class DepartamentoController {
 			return objectMapper.writeValueAsString(this.departamentoService.findById(id));
 	}
 	}
+	
+	@Operation(summary = "Borrar Departamento", description = "Esta operacion permite eliminar una departamento introduciendo como parametro su identificador (id)", tags = "Departamento")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "Se ha borrado el departamento de la base de datos correctamente", content = {
+					@Content(array = @ArraySchema(schema = @Schema(implementation = Departamento.class))) }),
+			@ApiResponse(responseCode = "404", description = "No disponible", content = @Content),
+			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(schema = @Schema(implementation = ErrorObject.class))) })
+
+	@DeleteMapping(path = "/eliminar/{id}")
+	public String eliminarPorId(@PathVariable("id") Long id) {
+		
+		if(this.departamentoService.findById(id)==null) {
+			return "No existe una departamento con el id " + id;
+			
+		}else {
+
+		Set<Profesor> profesores = this.departamentoService.findById(id).getProfesores();
+		profesores.stream().forEach(x->x.setDepartamento(null));
+		this.profesorService.saveAll(profesores);
+		boolean ok = this.departamentoService.eliminaDepartamentoPorId(id);
+		if (ok) {
+			return "Se eliminó la departamento con id " + id + "junto con todos las asignaturas que pertenecían a dicho departamento";
+		} else {
+			return "No pudo eliminar la departamento con id " + id;
+		}
+		}
+	}
+	
 }

@@ -5,6 +5,9 @@ import java.util.Set;
 
 import javax.persistence.*;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 
 
 @Entity
@@ -29,14 +32,13 @@ public class Asignatura {
 	private Titulacion titulacion;
 
 	@ManyToOne
-	@JoinColumn(name = "departamento_id")
 	private Departamento departamento;
 
 	
 	@ManyToMany
 	private List<Profesor> profesores;
 	
-	@ManyToMany(cascade = CascadeType.ALL)
+	@ManyToMany
 	@JoinTable(name = "asignatura_alumno",
     joinColumns = @JoinColumn(name = "asignatura_id", referencedColumnName = "id"),
     inverseJoinColumns = @JoinColumn(name = "alumno_id", referencedColumnName = "id"))
@@ -121,6 +123,7 @@ public class Asignatura {
 	public void setTitulacion(Titulacion titulacion) {
 		this.titulacion = titulacion;
 	}
+	
 	
 	
 

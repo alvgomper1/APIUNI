@@ -4,6 +4,9 @@ import java.util.Set;
 
 import javax.persistence.*;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 
 
 
@@ -13,7 +16,7 @@ public class Departamento {
 	
 	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(unique = true, nullable = false)
+    @Column( nullable = false)
 	private Long id;
 	
 	private String nombre;
@@ -26,12 +29,11 @@ public class Departamento {
 	
 	private String web;
 	
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "departamento")
+	@OneToMany(mappedBy = "departamento",cascade = CascadeType.ALL)
 	private Set<Asignatura> asignaturas;
 	
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "departamento")
+	@OneToMany(mappedBy = "departamento")
 	private Set<Profesor> profesores;
-	
 	
 	
 	
@@ -84,5 +86,4 @@ public class Departamento {
 		this.web = web;
 	}
 
-	
 }
