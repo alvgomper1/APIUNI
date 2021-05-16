@@ -32,8 +32,6 @@ public class Alumno {
     
     private String telefono;
     
-    
-
 
 	public Long getId() {
 		return id;

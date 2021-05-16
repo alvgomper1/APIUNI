@@ -4,9 +4,19 @@ import java.util.List;
 import java.util.Set;
 
 import javax.persistence.*;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 
 
@@ -15,6 +25,7 @@ public class Asignatura {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(unique = true, nullable = false)
+	@Hidden
 	private Long id;
 	private String nombre;
 
@@ -22,6 +33,7 @@ public class Asignatura {
 
 	private String duracion;
 
+	
 	private Integer creditos;
 	
 	private String ano;
@@ -35,11 +47,12 @@ public class Asignatura {
 	private Departamento departamento;
 
 	
-	@ManyToMany(cascade = CascadeType.ALL)
+	@ManyToMany()
 	private List<Profesor> profesores;
 	
 	 
 	@OneToMany
+	@JoinColumn(name = "id")
 	private Set<Alumno> alumnos;
 
 	public Long getId() {

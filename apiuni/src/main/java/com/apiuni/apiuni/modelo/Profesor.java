@@ -11,7 +11,7 @@ public class Profesor {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(unique = true, nullable = false)
+	@Column(nullable = false)
 	private Long id;
 	
 	private String nombre;
@@ -21,7 +21,7 @@ public class Profesor {
     @ManyToOne
     private Departamento departamento;
     
-    @ManyToMany(mappedBy = "profesores")
+    @ManyToMany()
 	private List<Asignatura> asignaturas;
     
 	public Long getId() {

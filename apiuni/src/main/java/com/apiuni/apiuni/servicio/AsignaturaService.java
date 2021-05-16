@@ -58,4 +58,10 @@ public void saveAll(Set<Asignatura> asignaturas) {
 	this.asignaturarepository.saveAll(asignaturas);
 }
 	
+public Asignatura findAleatorio() {
+	return this.asignaturarepository.findAleatorio();
+	
+}
+
+
 }
