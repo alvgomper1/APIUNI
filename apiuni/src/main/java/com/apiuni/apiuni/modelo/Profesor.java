@@ -4,13 +4,14 @@ import java.util.List;
 
 import javax.persistence.*;
 
+import io.swagger.v3.oas.annotations.Hidden;
+
 
 
 @Entity
 public class Profesor {
-
+	 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(nullable = false)
 	private Long id;
 	
@@ -21,11 +22,20 @@ public class Profesor {
     @ManyToOne
     private Departamento departamento;
     
-    @ManyToMany()
-	private List<Asignatura> asignaturas;
+    
+    
+    @ManyToMany(mappedBy = "profesores" ) 
+	private List<Asignatura> asignaturas;  
+    
+    @PreRemove
+    private void removeProfesoresFromAsignatura() {
+        for (Asignatura u : asignaturas) {
+            u.getProfesores().remove(this);
+        }
+    }
     
 	public Long getId() {
-		return id;
+		return id;  
 	}
 	public void setId(Long id) {
 		this.id = id;

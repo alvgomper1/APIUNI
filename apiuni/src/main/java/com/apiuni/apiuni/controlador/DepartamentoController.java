@@ -1,9 +1,6 @@
 package com.apiuni.apiuni.controlador;
 
-import java.util.List;
 import java.util.Set;
-
-import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,11 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.apiuni.apiuni.modelo.Asignatura;
 import com.apiuni.apiuni.modelo.Departamento;
 import com.apiuni.apiuni.modelo.ErrorObject;
 import com.apiuni.apiuni.modelo.Profesor;
-import com.apiuni.apiuni.modelo.Titulacion;
 import com.apiuni.apiuni.servicio.AsignaturaService;
 import com.apiuni.apiuni.servicio.DepartamentoService;
 import com.apiuni.apiuni.servicio.ProfesorService;
@@ -85,36 +80,36 @@ public class DepartamentoController {
 			if (asig && prof) {
 				d.setProfesores(null);
 				d.setAsignaturas(null);
-				Long id = this.departamentoService.saveId(d);
+				this.departamentoService.saveId(d);
 
-				return new ResponseEntity<Departamento>(HttpStatus.ACCEPTED);
+				return new ResponseEntity<Departamento>(HttpStatus.OK);
 
 			}
 
 			else if (asig && !prof) {
 
 				d.setAsignaturas(null);
-				Long id = this.departamentoService.saveId(d);
+				this.departamentoService.saveId(d);
 				this.profesorService.saveAll(d.getProfesores());
 
-				return new ResponseEntity<Departamento>(HttpStatus.ACCEPTED);
+				return new ResponseEntity<Departamento>(HttpStatus.OK);
 
 			} else if (!asig && prof) {
 
 				d.setAsignaturas(null);
-				Long id = this.departamentoService.saveId(d);
-				return new ResponseEntity<Departamento>(HttpStatus.ACCEPTED);
+				this.departamentoService.saveId(d);
+				return new ResponseEntity<Departamento>(HttpStatus.OK);
 
 			} else {
 
-				Long id = this.departamentoService.saveId(d);
+				this.departamentoService.saveId(d);
 
-				return new ResponseEntity<Departamento>(HttpStatus.ACCEPTED);
+				return new ResponseEntity<Departamento>(HttpStatus.OK);
 			}
 		} else {
-			Long id = this.departamentoService.saveId(d);
+			this.departamentoService.saveId(d);
 
-			return new ResponseEntity<Departamento>(HttpStatus.ACCEPTED);
+			return new ResponseEntity<Departamento>(HttpStatus.OK);
 		}
 	}
 
@@ -139,7 +134,7 @@ public class DepartamentoController {
 			this.profesorService.saveAll(profesores);
 			boolean ok = this.departamentoService.eliminaDepartamentoPorId(id);
 			if (ok) {
-				return new ResponseEntity<Departamento>(HttpStatus.ACCEPTED);
+				return new ResponseEntity<Departamento>(HttpStatus.OK);
 			} else {
 				return new ResponseEntity<Departamento>(HttpStatus.NOT_FOUND);
 			}

@@ -1,6 +1,7 @@
 package com.apiuni.apiuni.controlador;
 
-import javax.validation.Valid;
+import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,8 @@ import com.apiuni.apiuni.modelo.Asignatura;
 import com.apiuni.apiuni.modelo.Departamento;
 import com.apiuni.apiuni.modelo.ErrorObject;
 import com.apiuni.apiuni.modelo.Profesor;
+import com.apiuni.apiuni.modelo.Titulacion;
+import com.apiuni.apiuni.repositorio.AlumnoRepository;
 import com.apiuni.apiuni.servicio.AlumnoService;
 import com.apiuni.apiuni.servicio.AsignaturaService;
 import com.apiuni.apiuni.servicio.DepartamentoService;
@@ -77,45 +80,45 @@ public class AsignaturaController {
 			@ApiResponse(responseCode = "500", description = "No se ha podido crear la Asignatura porque se añadieron atributos que no están creados en la base de datos", content = @Content),
 			@ApiResponse(responseCode = "404", description = "No se ha encontrado la asignatura con ese id", content = {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject.class))) }),
+			@ApiResponse(responseCode = "409", description = "No se puede crear con ese id porque ya existe en la base de datos", content = {
+					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject.class))) }),
+
 			@ApiResponse(responseCode = "400", description = "Solicitud errónea", content = @Content(schema = @Schema(implementation = ErrorObject.class))) })
 	@PostMapping(path = "/añadir", consumes = "application/json")
-	public ResponseEntity<Asignatura> guardarAsignatura(@RequestBody Asignatura d) throws JsonProcessingException {
-
-		
-		boolean prof = d.getProfesores().stream()
-				.filter(x -> this.profesorService.obtenerProfesorPorId(x.getId()) == null).count() != 0;
-		boolean titulacion = this.titulacionService.findById(d.getTitulacion().getId()) == null;
-
-		boolean departamento = this.titulacionService.findById(d.getDepartamento().getId()) == null;
-
-		boolean alumnos = d.getAlumnos().stream().filter(x -> this.alumnosService.findAlumnoById(x.getId()) == null)
-				.count() != 0;
+	public ResponseEntity<Asignatura> guardarAsignatura(@RequestBody Asignatura d) {
 
 		if (d.getProfesores() != null && d.getTitulacion() != null && d.getDepartamento() != null
 				&& d.getAlumnos() != null) {
 
-			if (prof) {
+			if (asignaturaService.findById(d.getId()) != null) {
+				return new ResponseEntity<Asignatura>(HttpStatus.CONFLICT);
+
+			}
+			this.comprobacionAsignaturaRelaciones(d);
+			return new ResponseEntity<Asignatura>(HttpStatus.OK);
+
+		} else if (d.getProfesores() == null || d.getTitulacion() == null || d.getDepartamento() == null
+				|| d.getAlumnos() == null) {
+			if (d.getProfesores() == null) {
 				d.setProfesores(null);
 			}
-			if (titulacion) {
+			if (d.getTitulacion() == null) {
 				d.setTitulacion(null);
 			}
-			if (departamento) {
+			if (d.getDepartamento() == null) {
 				d.setDepartamento(null);
 			}
-			if (alumnos) {
+			if (d.getAlumnos() == null) {
 				d.setAlumnos(null);
 			}
-			Long id = this.asignaturaService.saveId(d);
-			
 
-			return new ResponseEntity<Asignatura>(HttpStatus.ACCEPTED);
+			this.asignaturaService.saveId(d);
 
+			return new ResponseEntity<Asignatura>(HttpStatus.OK);
 		} else {
-			Long id = this.asignaturaService.saveId(d);
-
-			return new ResponseEntity<Asignatura>(HttpStatus.ACCEPTED);
+			return new ResponseEntity<Asignatura>(HttpStatus.NOT_FOUND);
 		}
+
 	}
 
 	@Operation(summary = "Borrar Asignatura", description = "Esta operación permite eliminar una asignatura introduciendo como parámetro su identificador (id)", tags = "Asignatura")
@@ -136,7 +139,7 @@ public class AsignaturaController {
 
 			boolean ok = this.asignaturaService.eliminaAsignaturaPorId(id);
 			if (ok) {
-				return new ResponseEntity<Asignatura>(HttpStatus.ACCEPTED);
+				return new ResponseEntity<Asignatura>(HttpStatus.OK);
 			} else {
 				return new ResponseEntity<Asignatura>(HttpStatus.INTERNAL_SERVER_ERROR);
 			}
@@ -151,19 +154,19 @@ public class AsignaturaController {
 			@ApiResponse(responseCode = "404", description = "No se ha encontrado la asignatura con ese id", content = {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject.class))) }),
 			@ApiResponse(responseCode = "400", description = "Solicitud errónea", content = @Content(schema = @Schema(implementation = ErrorObject.class))) })
-	@PutMapping("{id}/añadirAlumno")
-	public ResponseEntity<Asignatura> anadeAlumnoAsignatura(@PathVariable("id") final long id,
-			@RequestBody final Alumno a) throws JsonProcessingException {
+	@PutMapping("{id_asignatura}/añadirAlumno")
+	public ResponseEntity<Asignatura> anadeAlumnoAsignatura(@PathVariable("id_asignatura") final long id,
+			@RequestBody final Alumno a) {
 
 		Asignatura asig = asignaturaService.findById(id);
 		if (asig == null) {
 			return new ResponseEntity<Asignatura>(HttpStatus.NOT_FOUND);
 		} else {
-			asig.getAlumnos().add(a);
-
 			alumnosService.save(a);
+			asig.getAlumnos().add(a);
 			asignaturaService.saveId(asig);
-			return new ResponseEntity<Asignatura>(HttpStatus.ACCEPTED);
+
+			return new ResponseEntity<Asignatura>(HttpStatus.OK);
 		}
 
 	}
@@ -194,9 +197,42 @@ public class AsignaturaController {
 			asig.getAlumnos().add(alum);
 
 			asignaturaService.saveId(asig);
-			return new ResponseEntity<Asignatura>(HttpStatus.ACCEPTED);
+			return new ResponseEntity<Asignatura>(HttpStatus.OK);
 		}
 
+	}
+
+	public void comprobacionAsignaturaRelaciones(Asignatura a) {
+
+		Set<Alumno> alumnos = a.getAlumnos();
+		List<Profesor> profesores = a.getProfesores();
+		Departamento departamento = a.getDepartamento();
+		Titulacion t = a.getTitulacion();
+
+		for (Alumno alumno : alumnos) {
+			if (alumnosService.findAlumnoById(alumno.getId()) == null) {
+				alumnosService.save(alumno);
+			}
+
+		}
+		for (Profesor profesor : profesores) {
+			if (profesorService.obtenerProfesorPorId(profesor.getId()) == null) {
+				a.setProfesores(null);
+			}
+
+		}
+
+		if (departamentoService.findById(departamento.getId()) == null) {
+			a.setDepartamento(null);
+
+		}
+
+		if (titulacionService.findById(t.getId()) == null) {
+			a.setTitulacion(null);
+
+		}
+
+		asignaturaService.saveId(a);
 	}
 
 }

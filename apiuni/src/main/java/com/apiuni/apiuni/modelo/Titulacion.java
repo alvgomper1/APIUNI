@@ -11,20 +11,19 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import io.swagger.v3.oas.annotations.Hidden;
 
 @Entity
 @Table(name = "titulaciones")
 public class Titulacion {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(nullable = false)
 	private Long id;
-
 
 	@Column(unique = true)
 	private String nombre;
 
-	
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "titulacion")
 	private List<Asignatura> asignaturas;
 
@@ -44,7 +43,6 @@ public class Titulacion {
 		this.nombre = nombre;
 	}
 
-
 	public List<Asignatura> getAsignaturas() {
 		return asignaturas;
 	}
@@ -52,7 +50,5 @@ public class Titulacion {
 	public void setAsignaturas(List<Asignatura> asignaturas) {
 		this.asignaturas = asignaturas;
 	}
-	
-	
 
 }

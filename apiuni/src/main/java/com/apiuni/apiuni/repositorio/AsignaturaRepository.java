@@ -16,6 +16,8 @@ public interface AsignaturaRepository extends CrudRepository<Asignatura,Long>{
 	public abstract List<Asignatura> findByDepartamento(Departamento d);
 	
 	
+	
+	
 	@Query(value = "SELECT rand() FROM Asignatura")
 	public Asignatura findAleatorio();
 

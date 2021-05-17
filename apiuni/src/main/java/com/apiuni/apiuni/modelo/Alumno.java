@@ -1,15 +1,15 @@
 package com.apiuni.apiuni.modelo;
 
-import java.util.Set;
-
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.PreRemove;
 
-import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Hidden;
 
  
 
@@ -21,9 +21,9 @@ public class Alumno {
 	  
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(unique = true, nullable = false)
-	private Long id;
+	 
+	private Long id; 
 	
 	private String nombre;
 	private String apellidos;
@@ -32,6 +32,15 @@ public class Alumno {
     
     private String telefono;
     
+    @ManyToMany(mappedBy = "alumnos" ) 
+	private List<Asignatura> asignaturas;  
+    
+    @PreRemove
+    private void removeAlumnosFromAsignatura() {
+        for (Asignatura u : asignaturas) {
+            u.getAlumnos().remove(this);
+        }
+    }
 
 	public Long getId() {
 		return id;

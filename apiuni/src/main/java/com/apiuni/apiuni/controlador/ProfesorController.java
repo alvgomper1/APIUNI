@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.apiuni.apiuni.modelo.Alumno;
 import com.apiuni.apiuni.modelo.ErrorObject;
 import com.apiuni.apiuni.modelo.Profesor;
 import com.apiuni.apiuni.servicio.AsignaturaService;
@@ -98,16 +97,16 @@ public class ProfesorController {
 			if (departamentoService.findById(p.getDepartamento().getId()) == null) {
 				p.setDepartamento(null);
 				this.profesorService.saveId(p);
-				return new ResponseEntity<Profesor>(HttpStatus.ACCEPTED);
+				return new ResponseEntity<Profesor>(HttpStatus.OK);
 			} else {
 				this.profesorService.saveId(p);
 
-				return new ResponseEntity<Profesor>(HttpStatus.ACCEPTED);
+				return new ResponseEntity<Profesor>(HttpStatus.OK);
 			}
 
 		} else {
 			this.profesorService.saveId(p);
-			return new ResponseEntity<Profesor>(HttpStatus.ACCEPTED);
+			return new ResponseEntity<Profesor>(HttpStatus.OK);
 		}
 
 	}
@@ -116,6 +115,7 @@ public class ProfesorController {
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "Se ha borrado el profesor de la base de datos correctamente", content = {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = Profesor.class))) }),
+			
 			@ApiResponse(responseCode = "404", description = "No se ha encontrado el profesor con ese id", content = {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject.class))) }),
 			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(schema = @Schema(implementation = ErrorObject.class))) })
@@ -124,7 +124,7 @@ public class ProfesorController {
 	public ResponseEntity<Profesor> eliminarPorId(@PathVariable("id") Long id) {
 		boolean ok = this.profesorService.eliminaProfesorPorId(id);
 		if (ok) {
-			return new ResponseEntity<Profesor>(HttpStatus.ACCEPTED);
+			return new ResponseEntity<Profesor>(HttpStatus.OK);
 
 		} else {
 			return new ResponseEntity<Profesor>(HttpStatus.NOT_FOUND);

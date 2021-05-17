@@ -4,8 +4,7 @@ import java.util.Set;
 
 import javax.persistence.*;
 
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import io.swagger.v3.oas.annotations.Hidden;
 
 
 
@@ -13,9 +12,8 @@ import org.hibernate.annotations.OnDeleteAction;
 @Entity
 public class Departamento {
 	
-	
+ 
 	@Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column( nullable = false)
 	private Long id;
 	

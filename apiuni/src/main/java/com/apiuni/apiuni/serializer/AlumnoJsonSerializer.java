@@ -1,8 +1,6 @@
 package com.apiuni.apiuni.serializer;
 
 import java.io.IOException;
-import java.util.stream.Collectors;
-
 import org.springframework.boot.jackson.JsonComponent;
 
 import com.apiuni.apiuni.modelo.Alumno;

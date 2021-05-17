@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.apiuni.apiuni.modelo.Asignatura;
-import com.apiuni.apiuni.modelo.Departamento;
 import com.apiuni.apiuni.repositorio.AsignaturaRepository;
  
 @Service

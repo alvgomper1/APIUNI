@@ -62,12 +62,11 @@ public class AlumnoController {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject.class))) }),
 			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(schema = @Schema(implementation = ErrorObject.class))) })
 	@PostMapping(path = "/añadir", consumes = "application/json")
-	public String guardarAlumno(@RequestBody Alumno a) throws JsonProcessingException {
+	public ResponseEntity<Alumno> guardarAlumno(@RequestBody Alumno a) {
 
-		Long id = this.alumnoService.saveId(a);
+		this.alumnoService.saveId(a);
 
-		return "Se ha creado correctamente el alumno: \n"
-				+ objectMapper.writeValueAsString(this.alumnoService.findAlumnoById(id));
+		return new ResponseEntity<Alumno>(HttpStatus.OK);
 
 	}
 
@@ -83,7 +82,7 @@ public class AlumnoController {
 	public ResponseEntity<Alumno> eliminarPorId(@PathVariable("id") Long id) {
 		boolean ok = this.alumnoService.eliminaAlumnoPorId(id);
 		if (ok) {
-			return new ResponseEntity<Alumno>(HttpStatus.ACCEPTED);
+			return new ResponseEntity<Alumno>(HttpStatus.OK);
 
 		} else {
 
@@ -103,15 +102,14 @@ public class AlumnoController {
 			@ApiResponse(responseCode = "500", description = "No se ha podido editar el alumno porque no existe en la base de datos o los datos introducidos son incorrectos", content = @Content),
 
 			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(schema = @Schema(implementation = ErrorObject.class))) })
-	@PutMapping("/{id}")
 
-	public ResponseEntity<Alumno> actualizaAlumno(@PathVariable("id") final long id, @RequestBody final Alumno a)
-			throws JsonProcessingException {
+	@PutMapping("/{id}")
+	public ResponseEntity<Alumno> actualizaAlumno(@PathVariable("id") final long id, @RequestBody final Alumno a) {
 
 		Alumno alumno = alumnoService.findAlumnoById(id);
 		if (alumno == null) {
 			return new ResponseEntity<Alumno>(HttpStatus.NOT_FOUND);
-//			return "No se ha encontrado un alumno con ese id en la base de datos";
+
 		} else {
 			alumno.setNombre(a.getNombre());
 			alumno.setApellidos(a.getApellidos());
@@ -120,9 +118,8 @@ public class AlumnoController {
 			alumno.setTelefono(a.getTelefono());
 
 			alumnoService.save(alumno);
-			return new ResponseEntity<Alumno>(HttpStatus.ACCEPTED);
-			// return "Se ha editado correctamente el alumno: \n" +
-			// objectMapper.writeValueAsString(a);
+			return new ResponseEntity<Alumno>(HttpStatus.OK);
+
 		}
 
 	}

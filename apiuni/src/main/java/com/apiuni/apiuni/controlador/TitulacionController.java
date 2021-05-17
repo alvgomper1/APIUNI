@@ -11,9 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.apiuni.apiuni.modelo.Departamento;
 import com.apiuni.apiuni.modelo.ErrorObject;
-import com.apiuni.apiuni.modelo.Profesor;
 import com.apiuni.apiuni.modelo.Titulacion;
 import com.apiuni.apiuni.servicio.AsignaturaService;
 import com.apiuni.apiuni.servicio.TitulacionService;
@@ -72,18 +70,18 @@ public class TitulacionController {
 				t.setAsignaturas(t.getAsignaturas());
 
 				this.titulacionService.saveId(t);
-				return new ResponseEntity<Titulacion>(HttpStatus.ACCEPTED);
+				return new ResponseEntity<Titulacion>(HttpStatus.OK);
 			} else {
 				t.setAsignaturas(null);
 				this.titulacionService.saveId(t);
-				return new ResponseEntity<Titulacion>(HttpStatus.ACCEPTED);
+				return new ResponseEntity<Titulacion>(HttpStatus.OK);
 			}
 
 		}
 
 		else {
 			this.titulacionService.saveId(t);
-			return new ResponseEntity<Titulacion>(HttpStatus.ACCEPTED);
+			return new ResponseEntity<Titulacion>(HttpStatus.OK);
 
 		}
 
@@ -107,7 +105,7 @@ public class TitulacionController {
 
 			boolean ok = this.titulacionService.eliminaTitulacionPorId(id);
 			if (ok) {
-				return new ResponseEntity<Titulacion>(HttpStatus.ACCEPTED);
+				return new ResponseEntity<Titulacion>(HttpStatus.OK);
 			} else {
 				return new ResponseEntity<Titulacion>(HttpStatus.NOT_FOUND);
 			}
