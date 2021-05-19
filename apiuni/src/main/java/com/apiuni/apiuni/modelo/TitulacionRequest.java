@@ -17,12 +17,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.v3.oas.annotations.Hidden;
 
-@Entity
-@Table(name = "titulaciones")
-public class Titulacion {
+ 
+public class TitulacionRequest {
 
-	@Id
-	@Column(nullable = false)
+	 
 	private Long id;
 
 	@Column(unique = true)
@@ -56,9 +54,6 @@ public class Titulacion {
 		this.asignaturas = asignaturas;
 	}
 	
-	@JsonProperty(value = "Asignaturas")
-	public List<String> getAsignaturasTitulacion() {
-		return new ArrayList<>();
-	}
+	
 
 }

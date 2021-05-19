@@ -15,6 +15,7 @@ import com.apiuni.apiuni.modelo.ErrorObject400;
 import com.apiuni.apiuni.modelo.ErrorObject404;
 import com.apiuni.apiuni.modelo.ErrorObject409;
 import com.apiuni.apiuni.modelo.Titulacion;
+import com.apiuni.apiuni.modelo.TitulacionRequest;
 import com.apiuni.apiuni.servicio.AsignaturaService;
 import com.apiuni.apiuni.servicio.TitulacionService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -65,35 +66,22 @@ public class TitulacionController {
 			@ApiResponse(responseCode = "409", description = "Ya existe una titulacion con ese id", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject409.class)), mediaType = "application/json")),
 			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject400.class)), mediaType = "application/json")) })
 	@PostMapping(path = "/añadir", consumes = "application/json")
-	public ResponseEntity<Titulacion> guardarTitulacion(@RequestBody Titulacion t) {
+	public ResponseEntity<Titulacion> guardarTitulacion(@RequestBody TitulacionRequest t) {
 
-		if(this.titulacionService.findById(t.getId())!= null) {
+		Titulacion res = this.titulacionService.findById(t.getId());
+		if(res!= null) {
 			
-			return new ResponseEntity<Titulacion>(HttpStatus.CONFLICT);
+			return new ResponseEntity<Titulacion>(res,HttpStatus.CONFLICT);
 		}
 		
-		
-		
-		if (t.getAsignaturas() != null) {
-
-			if (asignaturaService.existen(t.getAsignaturas())) {
-
-				t.setAsignaturas(t.getAsignaturas());
-
-				this.titulacionService.saveId(t);
-				return new ResponseEntity<Titulacion>(HttpStatus.OK);
-			} else {
-				t.setAsignaturas(null);
-				this.titulacionService.saveId(t);
-				return new ResponseEntity<Titulacion>(HttpStatus.OK);
-			}
-
-		}
-
 		else {
-			this.titulacionService.saveId(t);
-			return new ResponseEntity<Titulacion>(HttpStatus.OK);
-
+			
+			Titulacion titulacion = new Titulacion();
+			titulacion.setId(t.getId());
+			titulacion.setNombre(t.getNombre());
+			titulacion.setAsignaturas(null);			
+			titulacionService.saveId(titulacion);
+			return  new ResponseEntity<Titulacion>(titulacion,HttpStatus.OK);
 		}
 
 	}

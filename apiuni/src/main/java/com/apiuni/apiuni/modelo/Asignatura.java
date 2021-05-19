@@ -1,18 +1,19 @@
 package com.apiuni.apiuni.modelo;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import javax.persistence.*;
-import io.swagger.v3.oas.annotations.Hidden;
 
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 public class Asignatura {
 	@Id
 	@Column(unique = true, nullable = false)
-	 
+
 	private Long id;
 	private String nombre;
 
@@ -20,31 +21,26 @@ public class Asignatura {
 
 	private String duracion;
 
-	
 	private Integer creditos;
-	
+
 	private String ano;
 
-	
+	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "titulacion_id")
 	private Titulacion titulacion;
-
+	@JsonIgnore
 	@ManyToOne
 	private Departamento departamento;
 
-	
-	@ManyToMany()	
-	private List<Profesor> profesores;
-	
-	 
+	@JsonIgnore
 	@ManyToMany()
-	@JoinTable(
-	        name = "asignatura_alumnos",
-	        joinColumns = @JoinColumn(name = "FK_ASIGNATURA", nullable = false),
-	        inverseJoinColumns = @JoinColumn(name="FK_ALUMNOS", nullable = false)
-	    )
-	private Set<Alumno> alumnos; 
+	private List<Profesor> profesores;
+
+	@JsonIgnore
+	@ManyToMany()
+	@JoinTable(name = "asignatura_alumnos", joinColumns = @JoinColumn(name = "FK_ASIGNATURA", nullable = false), inverseJoinColumns = @JoinColumn(name = "FK_ALUMNOS", nullable = false))
+	private Set<Alumno> alumnos;
 
 	public Long getId() {
 		return id;
@@ -125,8 +121,25 @@ public class Asignatura {
 	public void setTitulacion(Titulacion titulacion) {
 		this.titulacion = titulacion;
 	}
-	
-	
-	
+
+	@JsonProperty(value = "Profesores")
+	public List<String> getProfesoresAsignatura() {
+		return new ArrayList<>();
+	}
+
+	@JsonProperty(value = "Alumnos")
+	public List<String> getAlumnosAsignatura() {
+		return new ArrayList<>();
+	}
+
+	@JsonProperty(value = "Titulacion")
+	public String getTitulacionAsignatura() {
+		return new String();
+	}
+
+	@JsonProperty(value = "Departamento")
+	public String getDepartamentoAsignatura() {
+		return new String();
+	}
 
 }

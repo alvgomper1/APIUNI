@@ -3,6 +3,7 @@ package com.apiuni.apiuni.controlador;
 import java.util.List;
 import java.util.Set;
 
+import org.aspectj.weaver.patterns.AbstractSignaturePattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.apiuni.apiuni.modelo.Alumno;
 import com.apiuni.apiuni.modelo.Asignatura;
+import com.apiuni.apiuni.modelo.AsignaturaRequest;
 import com.apiuni.apiuni.modelo.Departamento;
 import com.apiuni.apiuni.modelo.ErrorObject400;
 import com.apiuni.apiuni.modelo.ErrorObject404;
@@ -86,39 +88,33 @@ public class AsignaturaController {
 
 			@ApiResponse(responseCode = "400", description = "Solicitud errónea", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject400.class)), mediaType = "application/json")) })
 	@PostMapping(path = "/añadir", consumes = "application/json")
-	public ResponseEntity<Asignatura> guardarAsignatura(@RequestBody Asignatura d) {
-
-		if (d.getProfesores() != null && d.getTitulacion() != null && d.getDepartamento() != null
-				&& d.getAlumnos() != null) {
-
-			if (asignaturaService.findById(d.getId()) != null) {
-				return new ResponseEntity<Asignatura>(HttpStatus.CONFLICT);
-
-			}
-			this.comprobacionAsignaturaRelaciones(d);
-			return new ResponseEntity<Asignatura>(HttpStatus.OK);
-
-		} else if (d.getProfesores() == null || d.getTitulacion() == null || d.getDepartamento() == null
-				|| d.getAlumnos() == null) {
-			if (d.getProfesores() == null) {
-				d.setProfesores(null);
-			}
-			if (d.getTitulacion() == null) {
-				d.setTitulacion(null);
-			}
-			if (d.getDepartamento() == null) {
-				d.setDepartamento(null);
-			}
-			if (d.getAlumnos() == null) {
-				d.setAlumnos(null);
-			}
-
-			this.asignaturaService.saveId(d);
-
-			return new ResponseEntity<Asignatura>(HttpStatus.OK);
-		} else {
-			return new ResponseEntity<Asignatura>(HttpStatus.NOT_FOUND);
+	public ResponseEntity<Asignatura> guardarAsignatura(@RequestBody AsignaturaRequest a) {
+		
+		Asignatura asignatura2 = asignaturaService.findById(a.getId());
+		if (asignatura2!=null) {
+			return new ResponseEntity<Asignatura>(asignatura2,HttpStatus.CONFLICT);
 		}
+		
+		else {
+			Asignatura asignatura = new Asignatura();
+			asignatura .setAlumnos(null);
+			asignatura.setDepartamento(null);
+			asignatura.setProfesores(null);
+			asignatura.setTitulacion(null);			
+			asignatura.setAno(a.getAno());
+			asignatura.setCaracter(a.getCaracter());			
+			asignatura.setCreditos(a.getCreditos());			
+			asignatura.setDuracion(a.getDuracion());
+			asignatura.setId(a.getId());
+			asignatura.setNombre(a.getNombre());
+			
+			asignaturaService.saveId(asignatura);			
+			return new ResponseEntity<Asignatura>(asignatura,HttpStatus.OK);
+		}
+		
+		
+		
+		
 
 	}
 
@@ -137,7 +133,7 @@ public class AsignaturaController {
 			return new ResponseEntity<Asignatura>(HttpStatus.NOT_FOUND);
 
 		} else {
-
+			
 			boolean ok = this.asignaturaService.eliminaAsignaturaPorId(id);
 			if (ok) {
 				return new ResponseEntity<Asignatura>(HttpStatus.OK);
@@ -146,6 +142,7 @@ public class AsignaturaController {
 			}
 		}
 	}
+	// ----------------------------------------------------------------------------------------------------------------------
 
 	@Operation(summary = "Añadir alumno nuevo a la asignatura", description = "Esta operación crea un nuevo alumno y lo añade a la asignatura", tags = "Asignatura")
 	@ApiResponses(value = {
@@ -157,7 +154,7 @@ public class AsignaturaController {
 			@ApiResponse(responseCode = "400", description = "Solicitud errónea", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject400.class)),	mediaType = "application/json")) })
 	@PutMapping("{id_asignatura}/añadirAlumno")
 	public ResponseEntity<Asignatura> anadeAlumnoAsignatura(@PathVariable("id_asignatura") final long id,
-			@RequestBody final Alumno a) {
+			@RequestBody final Alumno a) { // POner aqui AlumnoRequest
 
 		Asignatura asig = asignaturaService.findById(id);
 		if (asig == null) {
@@ -170,7 +167,7 @@ public class AsignaturaController {
 			return new ResponseEntity<Asignatura>(HttpStatus.OK);
 		}
 
-	}
+	}  // ----------------------------------------------------------------------------------------------------------------------
 
 	@Operation(summary = "Añadir alumno existente a la asignatura", description = "Esta operación  añade un alumno a la asignatura", tags = "Asignatura")
 	@ApiResponses(value = {
@@ -186,54 +183,17 @@ public class AsignaturaController {
 
 		Asignatura asig = asignaturaService.findById(id);
 		Alumno alum = alumnosService.findAlumnoById(idAlumno);
-		if (asig == null) {
+		if (asig == null || alum == null) {
 			return new ResponseEntity<Asignatura>(HttpStatus.NOT_FOUND);
 		} else {
-			if (alum == null) {
-				return new ResponseEntity<Asignatura>(HttpStatus.NOT_FOUND);
-			} else {
-
-			}
+			   
 
 			asig.getAlumnos().add(alum);
 
 			asignaturaService.saveId(asig);
-			return new ResponseEntity<Asignatura>(HttpStatus.OK);
+			return new ResponseEntity<Asignatura>(asig,HttpStatus.OK);
 		}
 
-	}
-
-	public void comprobacionAsignaturaRelaciones(Asignatura a) {
-
-		Set<Alumno> alumnos = a.getAlumnos();
-		List<Profesor> profesores = a.getProfesores();
-		Departamento departamento = a.getDepartamento();
-		Titulacion t = a.getTitulacion();
-
-		for (Alumno alumno : alumnos) {
-			if (alumnosService.findAlumnoById(alumno.getId()) == null) {
-				alumnosService.save(alumno);
-			}
-
-		}
-		for (Profesor profesor : profesores) {
-			if (profesorService.obtenerProfesorPorId(profesor.getId()) == null) {
-				a.setProfesores(null);
-			}
-
-		}
-
-		if (departamentoService.findById(departamento.getId()) == null) {
-			a.setDepartamento(null);
-
-		}
-
-		if (titulacionService.findById(t.getId()) == null) {
-			a.setTitulacion(null);
-
-		}
-
-		asignaturaService.saveId(a);
 	}
 
 }
