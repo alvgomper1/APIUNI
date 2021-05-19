@@ -1,8 +1,13 @@
 package com.apiuni.apiuni.modelo;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.v3.oas.annotations.Hidden;
 
@@ -27,9 +32,11 @@ public class Departamento {
 	
 	private String web;
 	
+	@JsonIgnore
 	@OneToMany(mappedBy = "departamento",cascade = CascadeType.ALL)
 	private Set<Asignatura> asignaturas;
 	
+	@JsonIgnore
 	@OneToMany(mappedBy = "departamento")
 	private Set<Profesor> profesores;
 	
@@ -83,5 +90,18 @@ public class Departamento {
 	public void setWeb(String web) {
 		this.web = web;
 	}
+	
+	@JsonProperty(value = "Asignaturas")
+	public List<String> getAsignaturasDepartamento(){
+		return new ArrayList<>();
+	}
+	
+	
+	@JsonProperty(value = "Profesores")
+	public List<String> getProfesoresDepartamento(){
+		return new ArrayList<>();
+	}
+	
+	
 
 }

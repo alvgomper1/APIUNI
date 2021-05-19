@@ -67,6 +67,13 @@ public class TitulacionController {
 	@PostMapping(path = "/añadir", consumes = "application/json")
 	public ResponseEntity<Titulacion> guardarTitulacion(@RequestBody Titulacion t) {
 
+		if(this.titulacionService.findById(t.getId())!= null) {
+			
+			return new ResponseEntity<Titulacion>(HttpStatus.CONFLICT);
+		}
+		
+		
+		
 		if (t.getAsignaturas() != null) {
 
 			if (asignaturaService.existen(t.getAsignaturas())) {

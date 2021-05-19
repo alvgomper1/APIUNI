@@ -11,6 +11,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import io.swagger.v3.oas.annotations.Hidden;
 
 @Entity
@@ -24,6 +26,7 @@ public class Titulacion {
 	@Column(unique = true)
 	private String nombre;
 
+	@JsonIgnore
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "titulacion")
 	private List<Asignatura> asignaturas;
 

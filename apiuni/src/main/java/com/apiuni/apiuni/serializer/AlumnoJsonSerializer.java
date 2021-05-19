@@ -1,6 +1,8 @@
 package com.apiuni.apiuni.serializer;
 
 import java.io.IOException;
+import java.util.stream.Collectors;
+
 import org.springframework.boot.jackson.JsonComponent;
 
 import com.apiuni.apiuni.modelo.Alumno;
@@ -23,6 +25,7 @@ public class AlumnoJsonSerializer extends JsonSerializer<Alumno> {
 		jsonGenerator.writeStringField("nombre", alumno.getNombre().toString());
 		jsonGenerator.writeStringField("telefono", alumno.getTelefono().toString());
 		jsonGenerator.writeStringField("edad", alumno.getEdad().toString());
+		jsonGenerator.writeStringField("asignaturas", alumno.getAsignaturas().stream().map(x->x.getNombre()).collect(Collectors.toList()).toString());
 
 		
 

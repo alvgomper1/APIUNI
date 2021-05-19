@@ -56,7 +56,7 @@ public class AlumnoController {
 	@Operation(summary = "Crear alumno", description = "Se ha ejecutado la consulta correctamente", tags = "Alumno")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "Se ha creado el alumno y se ha insertado en la base de datos correctamente", content = {
-					@Content(array = @ArraySchema(schema = @Schema(implementation = Alumno.class))) }),
+					@Content(array = @ArraySchema(schema = @Schema(implementation = Alumno.class)),mediaType = "") }),
 			@ApiResponse(responseCode = "500", description = "No se ha podido crear el alumno porque el formato introducido es incorrecto", content = @Content()),
 			@ApiResponse(responseCode = "404", description = "No se ha encontrado el alumno con ese id", content = {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject404.class)), mediaType = "application/json") }),

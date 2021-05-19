@@ -14,8 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.apiuni.apiuni.modelo.Departamento;
+import com.apiuni.apiuni.modelo.DepartamentoRequest;
 import com.apiuni.apiuni.modelo.ErrorObject400;
 import com.apiuni.apiuni.modelo.ErrorObject404;
+import com.apiuni.apiuni.modelo.ErrorObject409;
 import com.apiuni.apiuni.modelo.Profesor;
 import com.apiuni.apiuni.servicio.AsignaturaService;
 import com.apiuni.apiuni.servicio.DepartamentoService;
@@ -63,60 +65,42 @@ public class DepartamentoController {
 	@Operation(summary = "Crear Departamento", description = "Esta operacion crea un nuevo Departamento y lo inserta en la base de datos", tags = "Departamento")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "Se ha creado el Departamento y se ha insertado en la base de datos correctamente", content = {
-					@Content(array = @ArraySchema(schema = @Schema(implementation = Departamento.class))) }),
+					@Content(array = @ArraySchema(schema = @Schema(implementation = DepartamentoRequest.class)),mediaType = "application/json") }),
 			@ApiResponse(responseCode = "500", description = "No se ha podido crear el Departamento porque se añadieron atributos que no estan creados en la base de datos", content = @Content),
 			@ApiResponse(responseCode = "404", description = "No se ha encontrado el departamento con ese id", content = {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject404.class)), mediaType = "application/json") }),
+			@ApiResponse(responseCode = "409", description = "Ya existe un departamento con ese id, el cual se muestra en la llamada", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject409.class)), mediaType = "application/json")),
 			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject400.class)), mediaType = "application/json")) })
 	@PostMapping(path = "/añadir", consumes = "application/json")
-	public ResponseEntity<Departamento> guardarDepartamento(@RequestBody Departamento d)
+	public ResponseEntity<Departamento> guardarDepartamento(@RequestBody DepartamentoRequest d)
 			throws JsonProcessingException {
 
-		boolean asig = d.getAsignaturas().stream().filter(x -> this.asignaturaService.findById(x.getId()) == null)
-				.count() != 0;
-		boolean prof = d.getProfesores().stream()
-				.filter(x -> this.profesorService.obtenerProfesorPorId(x.getId()) == null).count() != 0;
+		
+		if(this.departamentoService.findById(d.getId())!=null) {
+			Departamento dep = this.departamentoService.findById(d.getId());
+			return new ResponseEntity<Departamento>(dep,HttpStatus.CONFLICT);
+		
+		}else {
+			
+			Departamento departamento = new Departamento();
+			departamento.setAsignaturas(null);
+			departamento.setEmail(d.getEmail());
+			departamento.setId(d.getId());
+			departamento.setNombre(d.getNombre());
+			departamento.setProfesores(null);
+			departamento.setSede(d.getSede());
+			departamento.setTelefono(d.getTelefono());
+			departamento.setWeb(d.getWeb());
+			this.departamentoService.save(departamento);
 
-		if (d.getProfesores() != null && d.getAsignaturas() != null) {
-			if (asig && prof) {
-				d.setProfesores(null);
-				d.setAsignaturas(null);
-				this.departamentoService.saveId(d);
-
-				return new ResponseEntity<Departamento>(HttpStatus.OK);
-
-			}
-
-			else if (asig && !prof) {
-
-				d.setAsignaturas(null);
-				this.departamentoService.saveId(d);
-				this.profesorService.saveAll(d.getProfesores());
-
-				return new ResponseEntity<Departamento>(HttpStatus.OK);
-
-			} else if (!asig && prof) {
-
-				d.setAsignaturas(null);
-				this.departamentoService.saveId(d);
-				return new ResponseEntity<Departamento>(HttpStatus.OK);
-
-			} else {
-
-				this.departamentoService.saveId(d);
-
-				return new ResponseEntity<Departamento>(HttpStatus.OK);
-			}
-		} else {
-			this.departamentoService.saveId(d);
-
-			return new ResponseEntity<Departamento>(HttpStatus.OK);
+			return new ResponseEntity<Departamento>(departamento,HttpStatus.OK);
 		}
+		
 	}
 
 	@Operation(summary = "Borrar Departamento", description = "Esta operacion permite eliminar una departamento introduciendo como parametro su identificador (id)", tags = "Departamento")
 	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "Se ha borrado el departamento de la base de datos correctamente", content = {
+			@ApiResponse(responseCode = "200", description = "Se ha borrado el departamento que se muestra en la llamada de la base de datos correctamente", content = {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = Departamento.class))) }),
 			@ApiResponse(responseCode = "404", description = "No se ha encontrado el departamento con ese id", content = {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject404.class)), mediaType = "application/json") }),
@@ -130,12 +114,13 @@ public class DepartamentoController {
 
 		} else {
 
+			Departamento d= this.departamentoService.findById(id);
 			Set<Profesor> profesores = this.departamentoService.findById(id).getProfesores();
 			profesores.stream().forEach(x -> x.setDepartamento(null));
 			this.profesorService.saveAll(profesores);
 			boolean ok = this.departamentoService.eliminaDepartamentoPorId(id);
 			if (ok) {
-				return new ResponseEntity<Departamento>(HttpStatus.OK);
+				return new ResponseEntity<Departamento>(d,HttpStatus.OK);
 			} else {
 				return new ResponseEntity<Departamento>(HttpStatus.NOT_FOUND);
 			}

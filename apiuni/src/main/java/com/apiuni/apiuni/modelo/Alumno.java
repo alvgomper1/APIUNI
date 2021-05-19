@@ -1,6 +1,9 @@
 package com.apiuni.apiuni.modelo;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -8,6 +11,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.PreRemove;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.v3.oas.annotations.Hidden;
 
@@ -33,6 +40,7 @@ public class Alumno {
     private String telefono;
     
     @ManyToMany(mappedBy = "alumnos" ) 
+    @JsonIgnore()
 	private List<Asignatura> asignaturas;  
     
     @PreRemove
@@ -41,6 +49,11 @@ public class Alumno {
             u.getAlumnos().remove(this);
         }
     }
+    
+    @JsonProperty(value = "Asignaturas")
+	public List<String> getAsignaturasAlumno(){
+		return new ArrayList<>();
+	}
 
 	public Long getId() {
 		return id;
@@ -92,7 +105,16 @@ public class Alumno {
 	public void setTelefono(String telefono) {
 		this.telefono = telefono;
 	}
+
+	
+	public List<Asignatura> getAsignaturas() {
+		return asignaturas;
+	}
+
+	public void setAsignaturas(List<Asignatura> asignaturas) {
+		this.asignaturas = asignaturas;
+	}
     
-    
+	
 
 }
