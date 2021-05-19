@@ -1,5 +1,6 @@
 package com.apiuni.apiuni.controlador;
 
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +14,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.apiuni.apiuni.modelo.Asignatura;
 import com.apiuni.apiuni.modelo.ErrorObject400;
 import com.apiuni.apiuni.modelo.ErrorObject404;
+import com.apiuni.apiuni.modelo.ErrorObject409;
 import com.apiuni.apiuni.modelo.Profesor;
+import com.apiuni.apiuni.modelo.ProfesorRequest;
 import com.apiuni.apiuni.serializer.ProfesorJsonSerializer;
 import com.apiuni.apiuni.servicio.AsignaturaService;
 import com.apiuni.apiuni.servicio.DepartamentoService;
@@ -80,35 +84,30 @@ public class ProfesorController {
 	@Operation(summary = "Crear profesor", description = "Esta operacion crea un nuevo profesor y lo inserta en la base de datos", tags = "Profesor")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "Se ha ejecutado la consulta correctamente", content = {
-					@Content(array = @ArraySchema(schema = @Schema(implementation = Profesor.class))) }),
+					@Content(array = @ArraySchema(schema = @Schema(implementation = ProfesorRequest.class))) }),
 			@ApiResponse(responseCode = "500", description = "No se ha podido crear el profesor porque se añadieron atributos que no estan creados en la base de datos", content = @Content),
 			@ApiResponse(responseCode = "404", description = "No se ha encontrado el profesor con ese id", content = {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject404.class)), mediaType = "application/json") }),
+			@ApiResponse(responseCode = "409", description = "Ya existe un alumno con ese id que se muestra en la respuesta", content = {
+					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject409.class)), mediaType = "application/json") }),
 			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject400.class)), mediaType = "application/json")) })
 	@PostMapping(path = "/añadir", consumes = "application/json")
-	public ResponseEntity<Profesor> guardarprofesor(@RequestBody Profesor p) {
+	public ResponseEntity<Profesor> guardarprofesor(@RequestBody ProfesorRequest p) {
 
-		if (asignaturaService.existen(p.getAsignaturas())) {
-
-		} else {
-			p.setAsignaturas(null);
-		}
-
-		if (p.getDepartamento() != null) {
-
-			if (departamentoService.findById(p.getDepartamento().getId()) == null) {
-				p.setDepartamento(null);
-				this.profesorService.saveId(p);
-				return new ResponseEntity<Profesor>(HttpStatus.OK);
-			} else {
-				this.profesorService.saveId(p);
-
-				return new ResponseEntity<Profesor>(HttpStatus.OK);
-			}
-
-		} else {
-			this.profesorService.saveId(p);
-			return new ResponseEntity<Profesor>(HttpStatus.OK);
+		if(this.profesorService.obtenerProfesorPorId(p.getId())!=null) {
+			return new ResponseEntity<Profesor>(this.profesorService.obtenerProfesorPorId(p.getId()),HttpStatus.CONFLICT);
+		}else {
+			
+			Profesor profesor = new Profesor();
+			profesor.setAsignaturas(new ArrayList<Asignatura>());
+			profesor.setDepartamento(null);
+			profesor.setEmail(p.getEmail());
+			profesor.setId(p.getId());
+			profesor.setNombre(p.getNombre());
+			profesor.setTelefono(p.getTelefono());
+			profesorService.saveId(profesor);
+			
+			return new ResponseEntity<Profesor>(profesor,HttpStatus.OK);
 		}
 
 	}
@@ -124,8 +123,10 @@ public class ProfesorController {
 
 	@DeleteMapping(path = "/eliminar/{id}")
 	public ResponseEntity<Profesor> eliminarPorId(@PathVariable("id") Long id) {
+		
 		boolean ok = this.profesorService.eliminaProfesorPorId(id);
 		if (ok) {
+			
 			return new ResponseEntity<Profesor>(HttpStatus.OK);
 
 		} else {

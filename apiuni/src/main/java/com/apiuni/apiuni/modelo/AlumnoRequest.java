@@ -20,16 +20,11 @@ import io.swagger.v3.oas.annotations.Hidden;
 
  
 
-@Entity
 public class AlumnoRequest {
 	
-	  
-	  
-	  
+	   
 	
-	@Id
-	@Column(unique = true, nullable = false)
-	 
+	
 	private Long id; 
 	
 	private String nombre;

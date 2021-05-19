@@ -1,5 +1,6 @@
 package com.apiuni.apiuni.controlador;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.apiuni.apiuni.modelo.Alumno;
+import com.apiuni.apiuni.modelo.AlumnoRequest;
 import com.apiuni.apiuni.modelo.Asignatura;
 import com.apiuni.apiuni.modelo.AsignaturaRequest;
 import com.apiuni.apiuni.modelo.Departamento;
@@ -154,17 +156,31 @@ public class AsignaturaController {
 			@ApiResponse(responseCode = "400", description = "Solicitud errónea", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject400.class)),	mediaType = "application/json")) })
 	@PutMapping("{id_asignatura}/añadirAlumno")
 	public ResponseEntity<Asignatura> anadeAlumnoAsignatura(@PathVariable("id_asignatura") final long id,
-			@RequestBody final Alumno a) { // POner aqui AlumnoRequest
+			@RequestBody final AlumnoRequest a) { //Revision idAlumno
 
 		Asignatura asig = asignaturaService.findById(id);
 		if (asig == null) {
 			return new ResponseEntity<Asignatura>(HttpStatus.NOT_FOUND);
 		} else {
-			alumnosService.save(a);
-			asig.getAlumnos().add(a);
+			
+			
+			Alumno alumno = new Alumno();
+			alumno.setAsignaturas(new ArrayList<Asignatura>());
+			alumno.setApellidos(a.getApellidos());
+			
+			alumno.setEdad(a.getEdad());
+			alumno.setEmail(a.getEmail());
+			alumno.setId(a.getId());
+			alumno.setNombre(a.getNombre());
+			alumno.setTelefono(a.getTelefono());
+			
+			this.alumnosService.saveId(alumno);
+			
+			
+			asig.getAlumnos().add(alumno);
 			asignaturaService.saveId(asig);
 
-			return new ResponseEntity<Asignatura>(HttpStatus.OK);
+			return new ResponseEntity<Asignatura>(asig,HttpStatus.OK);
 		}
 
 	}  // ----------------------------------------------------------------------------------------------------------------------
