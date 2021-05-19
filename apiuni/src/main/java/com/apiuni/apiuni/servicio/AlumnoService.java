@@ -31,14 +31,7 @@ public class AlumnoService {
 	}
 
 	public boolean eliminaAlumnoPorId(long id) {
-		
-//		Alumno a = alumnoRepository.findById(id).get();
-//		
-//		List<Asignatura> asignaturas = asignaturaRepository.findByAlumno(a);
-//		
-//		for (int i = 0; i < asignaturas.size(); i++) {
-//			asignaturas.get(i);
-//		}
+
 		
 		try {
 			this.alumnoRepository.deleteById(id);

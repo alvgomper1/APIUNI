@@ -18,10 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.apiuni.apiuni.modelo.Alumno;
 import com.apiuni.apiuni.modelo.Asignatura;
 import com.apiuni.apiuni.modelo.Departamento;
-import com.apiuni.apiuni.modelo.ErrorObject;
+import com.apiuni.apiuni.modelo.ErrorObject400;
+import com.apiuni.apiuni.modelo.ErrorObject404;
+import com.apiuni.apiuni.modelo.ErrorObject409;
 import com.apiuni.apiuni.modelo.Profesor;
 import com.apiuni.apiuni.modelo.Titulacion;
-import com.apiuni.apiuni.repositorio.AlumnoRepository;
 import com.apiuni.apiuni.servicio.AlumnoService;
 import com.apiuni.apiuni.servicio.AsignaturaService;
 import com.apiuni.apiuni.servicio.DepartamentoService;
@@ -65,8 +66,8 @@ public class AsignaturaController {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = Asignatura.class)),
 
 							mediaType = "application/json") }),
-			@ApiResponse(responseCode = "404", description = "No disponible", content = @Content),
-			@ApiResponse(responseCode = "400", description = "Solicitud errónea", content = @Content(schema = @Schema(implementation = ErrorObject.class))) })
+			@ApiResponse(responseCode = "404", description = "No disponible", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject404.class)), mediaType = "application/json")),
+			@ApiResponse(responseCode = "400", description = "Solicitud errónea", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject400.class)), mediaType = "application/json")) })
 	@GetMapping()
 	public String obtenerAsignaturas() throws JsonProcessingException {
 
@@ -77,13 +78,13 @@ public class AsignaturaController {
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "Se ha ejecutado la consulta correctamente", content = {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = Asignatura.class))) }),
+			@ApiResponse(responseCode = "409", description = "No se puede crear con ese id porque ya existe en la base de datos", content = {
+					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject409.class)), mediaType = "application/json") }),
 			@ApiResponse(responseCode = "500", description = "No se ha podido crear la Asignatura porque se añadieron atributos que no están creados en la base de datos", content = @Content),
 			@ApiResponse(responseCode = "404", description = "No se ha encontrado la asignatura con ese id", content = {
-					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject.class))) }),
-			@ApiResponse(responseCode = "409", description = "No se puede crear con ese id porque ya existe en la base de datos", content = {
-					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject.class))) }),
+					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject404.class)), mediaType = "application/json") }),
 
-			@ApiResponse(responseCode = "400", description = "Solicitud errónea", content = @Content(schema = @Schema(implementation = ErrorObject.class))) })
+			@ApiResponse(responseCode = "400", description = "Solicitud errónea", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject400.class)), mediaType = "application/json")) })
 	@PostMapping(path = "/añadir", consumes = "application/json")
 	public ResponseEntity<Asignatura> guardarAsignatura(@RequestBody Asignatura d) {
 
@@ -126,8 +127,8 @@ public class AsignaturaController {
 			@ApiResponse(responseCode = "200", description = "Se ha borrado la asignatura de la base de datos correctamente", content = {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = Asignatura.class))) }),
 			@ApiResponse(responseCode = "404", description = "No se ha encontrado la asignatura con ese id", content = {
-					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject.class))) }),
-			@ApiResponse(responseCode = "400", description = "Solicitud errónea", content = @Content(schema = @Schema(implementation = ErrorObject.class))) })
+					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject404.class)), mediaType = "application/json") }),
+			@ApiResponse(responseCode = "400", description = "Solicitud errónea", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject400.class)), mediaType = "application/json")) })
 
 	@DeleteMapping(path = "/eliminar/{id}")
 	public ResponseEntity<Asignatura> eliminarPorId(@PathVariable("id") Long id) {
@@ -152,8 +153,8 @@ public class AsignaturaController {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = Asignatura.class))) }),
 			@ApiResponse(responseCode = "500", description = "No se ha podido añadir el alumno", content = @Content),
 			@ApiResponse(responseCode = "404", description = "No se ha encontrado la asignatura con ese id", content = {
-					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject.class))) }),
-			@ApiResponse(responseCode = "400", description = "Solicitud errónea", content = @Content(schema = @Schema(implementation = ErrorObject.class))) })
+					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject404.class)),	mediaType = "application/json") }),
+			@ApiResponse(responseCode = "400", description = "Solicitud errónea", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject400.class)),	mediaType = "application/json")) })
 	@PutMapping("{id_asignatura}/añadirAlumno")
 	public ResponseEntity<Asignatura> anadeAlumnoAsignatura(@PathVariable("id_asignatura") final long id,
 			@RequestBody final Alumno a) {
@@ -177,11 +178,11 @@ public class AsignaturaController {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = Asignatura.class))) }),
 			@ApiResponse(responseCode = "500", description = "No se ha podido añadir el alumno", content = @Content),
 			@ApiResponse(responseCode = "404", description = "No se ha encontrado la asignatura o el alumno con ese id", content = {
-					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject.class))) }),
-			@ApiResponse(responseCode = "400", description = "Solicitud errónea", content = @Content(schema = @Schema(implementation = ErrorObject.class))) })
+					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject404.class)),	mediaType = "application/json") }),
+			@ApiResponse(responseCode = "400", description = "Solicitud errónea", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject404.class)),	mediaType = "application/json")) })
 	@PutMapping("{id}/añadirAlumno/{idAlumno}")
 	public ResponseEntity<Asignatura> anadeAlumnoAsignaturaPorId(@PathVariable("id") final long id,
-			@PathVariable("idAlumno") final long idAlumno) throws JsonProcessingException {
+			@PathVariable("idAlumno") final long idAlumno)   {
 
 		Asignatura asig = asignaturaService.findById(id);
 		Alumno alum = alumnosService.findAlumnoById(idAlumno);

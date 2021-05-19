@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.apiuni.apiuni.modelo.ErrorObject;
+import com.apiuni.apiuni.modelo.ErrorObject400;
+import com.apiuni.apiuni.modelo.ErrorObject404;
+import com.apiuni.apiuni.modelo.ErrorObject409;
 import com.apiuni.apiuni.modelo.Titulacion;
 import com.apiuni.apiuni.servicio.AsignaturaService;
 import com.apiuni.apiuni.servicio.TitulacionService;
@@ -44,8 +46,9 @@ public class TitulacionController {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = Titulacion.class)),
 
 							mediaType = "application/json") }),
-			@ApiResponse(responseCode = "404", description = "No disponible", content = @Content),
-			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(schema = @Schema(implementation = ErrorObject.class))) })
+			@ApiResponse(responseCode = "404", description = "No disponible", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject404.class)), mediaType = "application/json")),
+
+			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject400.class)), mediaType = "application/json")) })
 	@GetMapping()
 	public String obtenerTitulaciones() throws JsonProcessingException {
 
@@ -58,10 +61,11 @@ public class TitulacionController {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = Titulacion.class))) }),
 			@ApiResponse(responseCode = "500", description = "No se ha podido crear la Titulacion porque se añadieron atributos que no estan creados en la base de datos", content = @Content),
 			@ApiResponse(responseCode = "404", description = "No se ha encontrado la titulacion con ese id", content = {
-					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject.class))) }),
-			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(schema = @Schema(implementation = ErrorObject.class))) })
+					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject404.class)), mediaType = "application/json") }),
+			@ApiResponse(responseCode = "409", description = "Ya existe una titulacion con ese id", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject409.class)), mediaType = "application/json")),
+			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject400.class)), mediaType = "application/json")) })
 	@PostMapping(path = "/añadir", consumes = "application/json")
-	public ResponseEntity<Titulacion> guardarTitulacion(@RequestBody Titulacion t) throws JsonProcessingException {
+	public ResponseEntity<Titulacion> guardarTitulacion(@RequestBody Titulacion t) {
 
 		if (t.getAsignaturas() != null) {
 
@@ -92,8 +96,8 @@ public class TitulacionController {
 			@ApiResponse(responseCode = "200", description = "Se ha borrado el Titulación de la base de datos correctamente", content = {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = Titulacion.class))) }),
 			@ApiResponse(responseCode = "404", description = "No se ha encontrado la titulacion con ese id", content = {
-					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject.class))) }),
-			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(schema = @Schema(implementation = ErrorObject.class))) })
+					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject404.class)), mediaType = "application/json") }),
+			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject400.class)), mediaType = "application/json")) })
 
 	@DeleteMapping(path = "/eliminar/{id}")
 	public ResponseEntity<Titulacion> eliminarPorId(@PathVariable("id") Long id) {

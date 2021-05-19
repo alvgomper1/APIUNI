@@ -14,7 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.apiuni.apiuni.modelo.Departamento;
-import com.apiuni.apiuni.modelo.ErrorObject;
+import com.apiuni.apiuni.modelo.ErrorObject400;
+import com.apiuni.apiuni.modelo.ErrorObject404;
 import com.apiuni.apiuni.modelo.Profesor;
 import com.apiuni.apiuni.servicio.AsignaturaService;
 import com.apiuni.apiuni.servicio.DepartamentoService;
@@ -51,8 +52,8 @@ public class DepartamentoController {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = Departamento.class)),
 
 							mediaType = "application/json") }),
-			@ApiResponse(responseCode = "404", description = "No disponible", content = @Content),
-			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(schema = @Schema(implementation = ErrorObject.class))) })
+			@ApiResponse(responseCode = "404", description = "No disponible", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject404.class)), mediaType = "application/json")),
+			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject400.class)), mediaType = "application/json")) })
 	@GetMapping()
 	public String obtenerDepartamentos() throws JsonProcessingException {
 
@@ -65,8 +66,8 @@ public class DepartamentoController {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = Departamento.class))) }),
 			@ApiResponse(responseCode = "500", description = "No se ha podido crear el Departamento porque se añadieron atributos que no estan creados en la base de datos", content = @Content),
 			@ApiResponse(responseCode = "404", description = "No se ha encontrado el departamento con ese id", content = {
-					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject.class))) }),
-			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(schema = @Schema(implementation = ErrorObject.class))) })
+					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject404.class)), mediaType = "application/json") }),
+			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject400.class)), mediaType = "application/json")) })
 	@PostMapping(path = "/añadir", consumes = "application/json")
 	public ResponseEntity<Departamento> guardarDepartamento(@RequestBody Departamento d)
 			throws JsonProcessingException {
@@ -118,8 +119,8 @@ public class DepartamentoController {
 			@ApiResponse(responseCode = "200", description = "Se ha borrado el departamento de la base de datos correctamente", content = {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = Departamento.class))) }),
 			@ApiResponse(responseCode = "404", description = "No se ha encontrado el departamento con ese id", content = {
-					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject.class))) }),
-			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(schema = @Schema(implementation = ErrorObject.class))) })
+					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject404.class)), mediaType = "application/json") }),
+			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject404.class)), mediaType = "application/json")) })
 
 	@DeleteMapping(path = "/eliminar/{id}")
 	public ResponseEntity<Departamento> eliminarPorId(@PathVariable("id") Long id) {

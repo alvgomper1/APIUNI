@@ -72,6 +72,14 @@ public class Profesor {
 		this.asignaturas = asignaturas;
 	}
 
+	@Override
+	public String toString() {
+		return "Profesor [id=" + id + ", nombre=" + nombre + ", email=" + email + ", telefono=" + telefono
+				+ ", departamento=" + departamento + ", asignaturas=" + asignaturas + "]";
+	}
+
+	
+
     
     
     

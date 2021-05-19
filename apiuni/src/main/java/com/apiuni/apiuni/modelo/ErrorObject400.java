@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 //@Data
 //@AllArgsConstructor
 //@NoArgsConstructor
-public class ErrorObject {
+public class ErrorObject400 {
 
     @Schema(
             description = "Codigo de error de estado HTTP",
@@ -19,21 +19,21 @@ public class ErrorObject {
 
     @Schema(
             description = "Error descripcion y detalles",
-            example = "El objeto solicitado no existe en la base de datos"
+            example = "Petición o Solicitud Incorrecta"
     )
     private String errorDescription;
     
     
     
 
-	public ErrorObject(String errorCode, String errorDescription) {
+	public ErrorObject400(String errorCode, String errorDescription) {
 		super();
 		this.errorCode = errorCode;
 		this.errorDescription = errorDescription;
 	}
 	
 
-	public ErrorObject() {
+	public ErrorObject400() {
 		super();
 	}
 
