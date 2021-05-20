@@ -1,5 +1,7 @@
 package com.apiuni.apiuni.controlador;
 
+import java.util.ArrayList;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.apiuni.apiuni.modelo.Alumno;
 import com.apiuni.apiuni.modelo.AlumnoRequest;
+<<<<<<< HEAD
+=======
+import com.apiuni.apiuni.modelo.Asignatura;
+>>>>>>> branch 'develop' of https://github.com/alvgomper1/APIUNI.git
 import com.apiuni.apiuni.modelo.ErrorObject400;
 import com.apiuni.apiuni.modelo.ErrorObject404;
 import com.apiuni.apiuni.modelo.ErrorObject409;
@@ -61,16 +67,27 @@ public class AlumnoController {
 			@ApiResponse(responseCode = "500", description = "No se ha podido crear el alumno porque el formato introducido es incorrecto", content = @Content()),
 			@ApiResponse(responseCode = "404", description = "No se ha encontrado el alumno con ese id", content = {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject404.class)), mediaType = "application/json") }),
-			@ApiResponse(responseCode = "409", description = "Ya existe un alumno con ese id", content = {
+			@ApiResponse(responseCode = "409", description = "Ya existe un alumno con ese id que se muestra en la respuesta", content = {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject409.class)), mediaType = "application/json") }),
 			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject400.class)), mediaType = "application/json")) })
 	@PostMapping(path = "/añadir", consumes = "application/json")
+<<<<<<< HEAD
 	public ResponseEntity<AlumnoRequest> guardarAlumno(@RequestBody AlumnoRequest a) {
+=======
+	public ResponseEntity<Alumno> guardarAlumno(@RequestBody AlumnoRequest a) {
+		
+>>>>>>> branch 'develop' of https://github.com/alvgomper1/APIUNI.git
 		if (alumnoService.findAlumnoById(a.getId()) != null) {
+<<<<<<< HEAD
 			return new ResponseEntity<AlumnoRequest>(a,HttpStatus.CONFLICT);
+=======
+			Alumno alum = this.alumnoService.findAlumnoById(a.getId());
+			return new ResponseEntity<Alumno>(alum,HttpStatus.CONFLICT);
+>>>>>>> branch 'develop' of https://github.com/alvgomper1/APIUNI.git
 		}
 
 		else {
+<<<<<<< HEAD
 			
 			Alumno alumno = new Alumno();
 			alumno .setNombre(a.getNombre());
@@ -82,15 +99,32 @@ public class AlumnoController {
 			alumnoService.save(alumno);
 			
 			
+=======
+			Alumno alumno = new Alumno();
+			alumno.setAsignaturas(new ArrayList<Asignatura>());
+			alumno.setApellidos(a.getApellidos());
+			
+			alumno.setEdad(a.getEdad());
+			alumno.setEmail(a.getEmail());
+			alumno.setId(a.getId());
+			alumno.setNombre(a.getNombre());
+			alumno.setTelefono(a.getTelefono());
+			
+			this.alumnoService.saveId(alumno);
+>>>>>>> branch 'develop' of https://github.com/alvgomper1/APIUNI.git
 
+<<<<<<< HEAD
 			return new ResponseEntity<AlumnoRequest>(a,HttpStatus.OK);
+=======
+			return new ResponseEntity<Alumno>(alumno,HttpStatus.OK);
+>>>>>>> branch 'develop' of https://github.com/alvgomper1/APIUNI.git
 		}
 
 	}
 
 	@Operation(summary = "Borrar alumno", description = "Esta operacion permite eliminar un alumno introduciendo como parametro su identificador (id)", tags = "Alumno")
 	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "Se ha borrado el alumno de la base de datos correctamente", content = {
+			@ApiResponse(responseCode = "200", description = "Se ha borrado el alumno que se muestra en la respuesta de la base de datos correctamente", content = {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = Alumno.class))) }),
 			@ApiResponse(responseCode = "404", description = "No se ha encontrado el alumno con ese id", content = {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject404.class)), mediaType = "application/json") }),
@@ -100,7 +134,7 @@ public class AlumnoController {
 	public ResponseEntity<Alumno> eliminarPorId(@PathVariable("id") Long id) {
 		boolean ok = this.alumnoService.eliminaAlumnoPorId(id);
 		if (ok) {
-			return new ResponseEntity<Alumno>(HttpStatus.OK);
+			return new ResponseEntity<Alumno>(this.alumnoService.findAlumnoById(id),HttpStatus.OK);
 
 		} else {
 
@@ -122,7 +156,7 @@ public class AlumnoController {
 			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject400.class)), mediaType = "application/json")) })
 
 	@PutMapping("/{id}")
-	public ResponseEntity<Alumno> actualizaAlumno(@PathVariable("id") final long id, @RequestBody final Alumno a) {
+	public ResponseEntity<Alumno> actualizaAlumno(@PathVariable("id") final long id, @RequestBody final AlumnoRequest a) {
 
 		Alumno alumno = alumnoService.findAlumnoById(id);
 		if (alumno == null) {
@@ -136,7 +170,7 @@ public class AlumnoController {
 			alumno.setTelefono(a.getTelefono());
 
 			alumnoService.save(alumno);
-			return new ResponseEntity<Alumno>(HttpStatus.OK);
+			return new ResponseEntity<Alumno>(alumno,HttpStatus.OK);
 
 		}
 

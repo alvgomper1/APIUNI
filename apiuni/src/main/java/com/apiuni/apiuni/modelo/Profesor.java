@@ -1,8 +1,12 @@
 package com.apiuni.apiuni.modelo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.v3.oas.annotations.Hidden;
 
@@ -19,11 +23,12 @@ public class Profesor {
     private String email;
     private String telefono;
     
+    @JsonIgnore
     @ManyToOne
     private Departamento departamento;
     
     
-    
+    @JsonIgnore
     @ManyToMany(mappedBy = "profesores" ) 
 	private List<Asignatura> asignaturas;  
     
@@ -79,7 +84,16 @@ public class Profesor {
 	}
 
 	
-
+	@JsonProperty(value = "Asignaturas")
+	public List<String> getAsignaturasProfesor(){
+		return new ArrayList<>();
+	}
+	
+	
+	@JsonProperty(value = "Departamento")
+	public String getDepartamentoProfesor(){
+		return "Departamento";
+	}
     
     
     

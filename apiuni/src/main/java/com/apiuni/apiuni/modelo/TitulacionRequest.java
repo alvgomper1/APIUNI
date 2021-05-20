@@ -23,12 +23,10 @@ public class TitulacionRequest {
 	 
 	private Long id;
 
-	@Column(unique = true)
+	
 	private String nombre;
 
-	@JsonIgnore
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "titulacion")
-	private List<Asignatura> asignaturas;
+	
 
 	public Long getId() {
 		return id;
@@ -46,13 +44,7 @@ public class TitulacionRequest {
 		this.nombre = nombre;
 	}
 
-	public List<Asignatura> getAsignaturas() {
-		return asignaturas;
-	}
-
-	public void setAsignaturas(List<Asignatura> asignaturas) {
-		this.asignaturas = asignaturas;
-	}
+	
 	
 	
 
