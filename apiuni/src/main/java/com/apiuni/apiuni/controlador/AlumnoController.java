@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.apiuni.apiuni.modelo.Alumno;
+import com.apiuni.apiuni.modelo.AlumnoRequest;
 import com.apiuni.apiuni.modelo.ErrorObject400;
 import com.apiuni.apiuni.modelo.ErrorObject404;
 import com.apiuni.apiuni.modelo.ErrorObject409;
@@ -56,7 +57,7 @@ public class AlumnoController {
 	@Operation(summary = "Crear alumno", description = "Se ha ejecutado la consulta correctamente", tags = "Alumno")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "Se ha creado el alumno y se ha insertado en la base de datos correctamente", content = {
-					@Content(array = @ArraySchema(schema = @Schema(implementation = Alumno.class)),mediaType = "") }),
+					@Content(array = @ArraySchema(schema = @Schema(implementation = Alumno.class)),mediaType = "application/json") }),
 			@ApiResponse(responseCode = "500", description = "No se ha podido crear el alumno porque el formato introducido es incorrecto", content = @Content()),
 			@ApiResponse(responseCode = "404", description = "No se ha encontrado el alumno con ese id", content = {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject404.class)), mediaType = "application/json") }),
@@ -64,15 +65,25 @@ public class AlumnoController {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject409.class)), mediaType = "application/json") }),
 			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject400.class)), mediaType = "application/json")) })
 	@PostMapping(path = "/añadir", consumes = "application/json")
-	public ResponseEntity<Alumno> guardarAlumno(@RequestBody Alumno a) {
+	public ResponseEntity<AlumnoRequest> guardarAlumno(@RequestBody AlumnoRequest a) {
 		if (alumnoService.findAlumnoById(a.getId()) != null) {
-			return new ResponseEntity<Alumno>(HttpStatus.CONFLICT);
+			return new ResponseEntity<AlumnoRequest>(a,HttpStatus.CONFLICT);
 		}
 
 		else {
-			this.alumnoService.saveId(a);
+			
+			Alumno alumno = new Alumno();
+			alumno .setNombre(a.getNombre());
+			alumno.setApellidos(a.getApellidos());
+			alumno.setEdad(a.getEdad());
+			alumno.setEmail(a.getEmail());
+			alumno.setTelefono(a.getTelefono());
+			alumno.setId(a.getId());
+			alumnoService.save(alumno);
+			
+			
 
-			return new ResponseEntity<Alumno>(HttpStatus.OK);
+			return new ResponseEntity<AlumnoRequest>(a,HttpStatus.OK);
 		}
 
 	}

@@ -7,13 +7,17 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.apiuni.apiuni.modelo.Asignatura;
+import com.apiuni.apiuni.modelo.Departamento;
 import com.apiuni.apiuni.modelo.ErrorObject400;
 import com.apiuni.apiuni.modelo.ErrorObject404;
 import com.apiuni.apiuni.modelo.ErrorObject409;
+import com.apiuni.apiuni.modelo.Profesor;
 import com.apiuni.apiuni.modelo.Titulacion;
 import com.apiuni.apiuni.modelo.TitulacionRequest;
 import com.apiuni.apiuni.servicio.AsignaturaService;
@@ -110,5 +114,48 @@ public class TitulacionController {
 			}
 		}
 	}
+	
+	
+	
+	
+	
+	
+	@Operation(summary = "Añadir asignatura a la titulacion", description = "Esta operación  añade una asignatura la titulacion", tags = "Titulación")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "Se ha ejecutado la consulta correctamente", content = {
+					@Content(array = @ArraySchema(schema = @Schema(implementation = Titulacion.class)), mediaType = "application/json") }),
+			
+			@ApiResponse(responseCode = "409", description = "La asignatura ya tiene otra titulacion", content = {
+					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject409.class)), mediaType = "application/json") }),
+			
+			@ApiResponse(responseCode = "500", description = "No se ha podido añadir la asignatura", content = @Content),
+			@ApiResponse(responseCode = "404", description = "No se ha encontrado la titulacion o la asignatura con ese id", content = {
+					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject404.class)),	mediaType = "application/json") }),
+			@ApiResponse(responseCode = "400", description = "Solicitud errónea", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject404.class)),	mediaType = "application/json")) })
+	@PutMapping("{idTitulacion}/añadirAsignatura/{idAsignatura}")
+	public ResponseEntity<Titulacion> anadeAsignaturaPorId(@PathVariable("idAsignatura") final long idAsignatura,
+			@PathVariable("idTitulacion") final long idTitulacion)   {
+
+		Titulacion t = titulacionService.findById(idTitulacion);
+		Asignatura a = asignaturaService.findById(idAsignatura);
+				
+		if (t == null || a == null) {
+			return new ResponseEntity<Titulacion>(HttpStatus.NOT_FOUND);
+		} else {
+			
+			if (a.getTitulacion()!=null) {
+				//La asignatura ya tiene departamento
+				return new ResponseEntity<Titulacion>(titulacionService.findById(idTitulacion),HttpStatus.CONFLICT);
+			}
+			else {
+			t.getAsignaturas().add(a);
+			a.setTitulacion(t);
+			
+			titulacionService.saveId(t);
+			asignaturaService.saveId(a);
+			return new ResponseEntity<Titulacion>(t,HttpStatus.OK);	
+			}
+			
+		}}
 
 }

@@ -9,10 +9,13 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.apiuni.apiuni.modelo.Alumno;
+import com.apiuni.apiuni.modelo.Asignatura;
 import com.apiuni.apiuni.modelo.ErrorObject400;
 import com.apiuni.apiuni.modelo.ErrorObject404;
 import com.apiuni.apiuni.modelo.Profesor;
@@ -134,5 +137,51 @@ public class ProfesorController {
 		}
 
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	@Operation(summary = "Añadir asignatura al profesor", description = "Esta operación  añade una asignatura al profesor", tags = "Profesor")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "Se ha ejecutado la consulta correctamente", content = {
+					@Content(array = @ArraySchema(schema = @Schema(implementation = Profesor.class))) }),
+			@ApiResponse(responseCode = "500", description = "No se ha podido añadir la asignatura", content = @Content),
+			@ApiResponse(responseCode = "404", description = "No se ha encontrado la asignatura o el profesor con ese id", content = {
+					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject404.class)),	mediaType = "application/json") }),
+			@ApiResponse(responseCode = "400", description = "Solicitud errónea", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject404.class)),	mediaType = "application/json")) })
+	@PutMapping("{idProfesor}/añadirAsignatura/{idAsignatura}")
+	public ResponseEntity<Profesor> anadeAsignaturaPorId(@PathVariable("idAsignatura") final long idAsignatura,
+			@PathVariable("idProfesor") final long idProfesor)   {
+
+		Asignatura asig = asignaturaService.findById(idAsignatura);
+		Profesor p = profesorService.obtenerProfesorPorId(idProfesor);
+		if (asig == null || p == null) {
+			return new ResponseEntity<Profesor>(HttpStatus.NOT_FOUND);
+		} else {
+			   
+			asig.getProfesores().add(p);
+			p.getAsignaturas().add(asig);
+
+			profesorService.saveId(p);
+			asignaturaService.saveId(asig);
+			return new ResponseEntity<Profesor>(p,HttpStatus.OK);
+		}
+
+	}
+	
+	
+	
+	
+	
 
 }

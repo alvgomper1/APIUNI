@@ -9,10 +9,12 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.apiuni.apiuni.modelo.Asignatura;
 import com.apiuni.apiuni.modelo.Departamento;
 import com.apiuni.apiuni.modelo.DepartamentoRequest;
 import com.apiuni.apiuni.modelo.ErrorObject400;
@@ -125,6 +127,86 @@ public class DepartamentoController {
 				return new ResponseEntity<Departamento>(HttpStatus.NOT_FOUND);
 			}
 		}
+	}
+	
+	
+	@Operation(summary = "Añadir profesor al departamento", description = "Esta operación  añade un profesor al departamento", tags = "Departamento")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "Se ha ejecutado la consulta correctamente", content = {
+					@Content(array = @ArraySchema(schema = @Schema(implementation = Departamento.class)), mediaType = "application/json") }),
+			
+			@ApiResponse(responseCode = "409", description = "El profesor ya tiene otro departamento", content = {
+					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject409.class)), mediaType = "application/json") }),
+			
+			@ApiResponse(responseCode = "500", description = "No se ha podido añadir el profesor", content = @Content),
+			@ApiResponse(responseCode = "404", description = "No se ha encontrado el departamento o el profesor con ese id", content = {
+					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject404.class)),	mediaType = "application/json") }),
+			@ApiResponse(responseCode = "400", description = "Solicitud errónea", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject404.class)),	mediaType = "application/json")) })
+	@PutMapping("{idDepartamento}/añadirProfesor/{idProfesor}")
+	public ResponseEntity<Departamento> anadeProfesorPorId(@PathVariable("idDepartamento") final long idDepartamento,
+			@PathVariable("idProfesor") final long idProfesor)   {
+
+		Departamento d = departamentoService.findById(idDepartamento);
+		Profesor p = profesorService.obtenerProfesorPorId(idProfesor);
+		if (d == null || p == null) {
+			return new ResponseEntity<Departamento>(HttpStatus.NOT_FOUND);
+		} else {
+			
+			if (p.getDepartamento()!=null) {
+				//El profesor ya tiene departamento
+				return new ResponseEntity<Departamento>(HttpStatus.CONFLICT);
+			}
+			else {
+			d.getProfesores().add(p);
+			p.setDepartamento(d);
+			
+			departamentoService.save(d);
+			profesorService.saveId(p);
+			return new ResponseEntity<Departamento>(d,HttpStatus.OK);	
+			}
+			
+		}
+
+	}
+	
+	@Operation(summary = "Añadir asignatura al departamento", description = "Esta operación  añade una asignatura al departamento", tags = "Departamento")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "Se ha ejecutado la consulta correctamente", content = {
+					@Content(array = @ArraySchema(schema = @Schema(implementation = Departamento.class)), mediaType = "application/json") }),
+			
+			@ApiResponse(responseCode = "409", description = "La asignatura ya tiene otro departamento", content = {
+					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject409.class)), mediaType = "application/json") }),
+			
+			@ApiResponse(responseCode = "500", description = "No se ha podido añadir la asignatura", content = @Content),
+			@ApiResponse(responseCode = "404", description = "No se ha encontrado el departamento o la asignatura con ese id", content = {
+					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject404.class)),	mediaType = "application/json") }),
+			@ApiResponse(responseCode = "400", description = "Solicitud errónea", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject404.class)),	mediaType = "application/json")) })
+	@PutMapping("{idDepartamento}/añadirAsignatura/{idAsignatura}")
+	public ResponseEntity<Departamento> anadeAsignaturaPorId(@PathVariable("idAsignatura") final long idAsignatura,
+			@PathVariable("idDepartamento") final long idDepartamento)   {
+
+		Departamento d = departamentoService.findById(idDepartamento);
+		Asignatura a = asignaturaService.findById(idAsignatura);
+				
+		if (d == null || a == null) {
+			return new ResponseEntity<Departamento>(HttpStatus.NOT_FOUND);
+		} else {
+			
+			if (a.getDepartamento()!=null) {
+				//La asignatura ya tiene departamento
+				return new ResponseEntity<Departamento>(departamentoService.findById(idDepartamento),HttpStatus.CONFLICT);
+			}
+			else {
+			d.getAsignaturas().add(a);
+			a.setDepartamento(d);
+			
+			departamentoService.save(d);
+			asignaturaService.saveId(a);
+			return new ResponseEntity<Departamento>(d,HttpStatus.OK);	
+			}
+			
+		}
+
 	}
 
 }
