@@ -16,10 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.apiuni.apiuni.modelo.Alumno;
 import com.apiuni.apiuni.modelo.AlumnoRequest;
-<<<<<<< HEAD
-=======
+
+
 import com.apiuni.apiuni.modelo.Asignatura;
->>>>>>> branch 'develop' of https://github.com/alvgomper1/APIUNI.git
+
 import com.apiuni.apiuni.modelo.ErrorObject400;
 import com.apiuni.apiuni.modelo.ErrorObject404;
 import com.apiuni.apiuni.modelo.ErrorObject409;
@@ -71,35 +71,22 @@ public class AlumnoController {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject409.class)), mediaType = "application/json") }),
 			@ApiResponse(responseCode = "400", description = "Solicitud erronea", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject400.class)), mediaType = "application/json")) })
 	@PostMapping(path = "/añadir", consumes = "application/json")
-<<<<<<< HEAD
+
 	public ResponseEntity<AlumnoRequest> guardarAlumno(@RequestBody AlumnoRequest a) {
-=======
-	public ResponseEntity<Alumno> guardarAlumno(@RequestBody AlumnoRequest a) {
+
 		
->>>>>>> branch 'develop' of https://github.com/alvgomper1/APIUNI.git
+		if(a.getId()<0) {
+			return new ResponseEntity<AlumnoRequest>(HttpStatus.BAD_REQUEST);
+		}
+		
 		if (alumnoService.findAlumnoById(a.getId()) != null) {
-<<<<<<< HEAD
+
 			return new ResponseEntity<AlumnoRequest>(a,HttpStatus.CONFLICT);
-=======
-			Alumno alum = this.alumnoService.findAlumnoById(a.getId());
-			return new ResponseEntity<Alumno>(alum,HttpStatus.CONFLICT);
->>>>>>> branch 'develop' of https://github.com/alvgomper1/APIUNI.git
+
 		}
 
 		else {
-<<<<<<< HEAD
-			
-			Alumno alumno = new Alumno();
-			alumno .setNombre(a.getNombre());
-			alumno.setApellidos(a.getApellidos());
-			alumno.setEdad(a.getEdad());
-			alumno.setEmail(a.getEmail());
-			alumno.setTelefono(a.getTelefono());
-			alumno.setId(a.getId());
-			alumnoService.save(alumno);
-			
-			
-=======
+
 			Alumno alumno = new Alumno();
 			alumno.setAsignaturas(new ArrayList<Asignatura>());
 			alumno.setApellidos(a.getApellidos());
@@ -111,13 +98,9 @@ public class AlumnoController {
 			alumno.setTelefono(a.getTelefono());
 			
 			this.alumnoService.saveId(alumno);
->>>>>>> branch 'develop' of https://github.com/alvgomper1/APIUNI.git
 
-<<<<<<< HEAD
 			return new ResponseEntity<AlumnoRequest>(a,HttpStatus.OK);
-=======
-			return new ResponseEntity<Alumno>(alumno,HttpStatus.OK);
->>>>>>> branch 'develop' of https://github.com/alvgomper1/APIUNI.git
+
 		}
 
 	}

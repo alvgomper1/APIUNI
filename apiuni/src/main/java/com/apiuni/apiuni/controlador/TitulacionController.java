@@ -72,6 +72,12 @@ public class TitulacionController {
 	@PostMapping(path = "/añadir", consumes = "application/json")
 	public ResponseEntity<Titulacion> guardarTitulacion(@RequestBody TitulacionRequest t) {
 
+		
+		if(t.getId()<0) {
+			return new ResponseEntity<Titulacion>(HttpStatus.BAD_REQUEST);
+		}
+		
+		
 		Titulacion res = this.titulacionService.findById(t.getId());
 		if(res!= null) {
 			

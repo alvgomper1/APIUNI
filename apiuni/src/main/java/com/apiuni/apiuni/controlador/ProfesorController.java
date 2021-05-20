@@ -15,11 +15,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-<<<<<<< HEAD
+
 import com.apiuni.apiuni.modelo.Alumno;
-=======
->>>>>>> branch 'develop' of https://github.com/alvgomper1/APIUNI.git
+
 import com.apiuni.apiuni.modelo.Asignatura;
+import com.apiuni.apiuni.modelo.Departamento;
 import com.apiuni.apiuni.modelo.ErrorObject400;
 import com.apiuni.apiuni.modelo.ErrorObject404;
 import com.apiuni.apiuni.modelo.ErrorObject409;
@@ -99,6 +99,11 @@ public class ProfesorController {
 	@PostMapping(path = "/añadir", consumes = "application/json")
 	public ResponseEntity<Profesor> guardarprofesor(@RequestBody ProfesorRequest p) {
 
+		
+		if(p.getId()<0) {
+			return new ResponseEntity<Profesor>(HttpStatus.BAD_REQUEST);
+		}
+		
 		if(this.profesorService.obtenerProfesorPorId(p.getId())!=null) {
 			return new ResponseEntity<Profesor>(this.profesorService.obtenerProfesorPorId(p.getId()),HttpStatus.CONFLICT);
 		}else {

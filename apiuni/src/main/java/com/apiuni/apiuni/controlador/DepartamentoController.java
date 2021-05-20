@@ -77,6 +77,9 @@ public class DepartamentoController {
 	public ResponseEntity<Departamento> guardarDepartamento(@RequestBody DepartamentoRequest d)
 			throws JsonProcessingException {
 
+		if(d.getId()<0) {
+			return new ResponseEntity<Departamento>(HttpStatus.BAD_REQUEST);
+		}
 		
 		if(this.departamentoService.findById(d.getId())!=null) {
 			Departamento dep = this.departamentoService.findById(d.getId());

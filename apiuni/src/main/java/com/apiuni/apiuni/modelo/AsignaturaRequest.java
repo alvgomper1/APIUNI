@@ -1,8 +1,12 @@
 package com.apiuni.apiuni.modelo;
 
+import javax.validation.constraints.Min;
+
 public class AsignaturaRequest {
 
+	@Min(value = 0)
 	private Long id;
+	
 	private String nombre;
 
 	private String caracter;

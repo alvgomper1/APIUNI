@@ -5,15 +5,16 @@ import java.util.List;
 import java.util.Set;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 public class Asignatura {
+	
 	@Id
 	@Column(unique = true, nullable = false)
-
 	private Long id;
 	private String nombre;
 

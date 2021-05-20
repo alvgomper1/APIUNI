@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import javax.validation.Valid;
+
 import org.aspectj.weaver.patterns.AbstractSignaturePattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -92,6 +94,11 @@ public class AsignaturaController {
 	@PostMapping(path = "/añadir", consumes = "application/json")
 	public ResponseEntity<Asignatura> guardarAsignatura(@RequestBody AsignaturaRequest a) {
 		
+		
+		if(a.getId()<0) {
+			return new ResponseEntity<Asignatura>(HttpStatus.BAD_REQUEST);
+		}
+		
 		Asignatura asignatura2 = asignaturaService.findById(a.getId());
 		if (asignatura2!=null) {
 			return new ResponseEntity<Asignatura>(asignatura2,HttpStatus.CONFLICT);
@@ -153,6 +160,8 @@ public class AsignaturaController {
 			@ApiResponse(responseCode = "500", description = "No se ha podido añadir el alumno", content = @Content),
 			@ApiResponse(responseCode = "404", description = "No se ha encontrado la asignatura con ese id", content = {
 					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject404.class)),	mediaType = "application/json") }),
+			@ApiResponse(responseCode = "409", description = "No se puede crear con ese id porque ya existe en la base de datos", content = {
+					@Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject409.class)), mediaType = "application/json") }),
 			@ApiResponse(responseCode = "400", description = "Solicitud errónea", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorObject400.class)),	mediaType = "application/json")) })
 	@PutMapping("{id_asignatura}/añadirAlumno")
 	public ResponseEntity<Asignatura> anadeAlumnoAsignatura(@PathVariable("id_asignatura") final long id,
@@ -163,7 +172,16 @@ public class AsignaturaController {
 			return new ResponseEntity<Asignatura>(HttpStatus.NOT_FOUND);
 		} else {
 			
-			
+			if(this.alumnosService.findAlumnoById(a.getId())!=null) {
+				
+
+				return new ResponseEntity<Asignatura>(asig,HttpStatus.CONFLICT);
+				
+			}else {
+				
+			if(a.getId()<0) {
+				return new ResponseEntity<Asignatura>(asig,HttpStatus.BAD_REQUEST);
+			}	else {
 			Alumno alumno = new Alumno();
 			alumno.setAsignaturas(new ArrayList<Asignatura>());
 			alumno.setApellidos(a.getApellidos());
@@ -176,11 +194,13 @@ public class AsignaturaController {
 			
 			this.alumnosService.saveId(alumno);
 			
-			
 			asig.getAlumnos().add(alumno);
 			asignaturaService.saveId(asig);
 
-			return new ResponseEntity<Asignatura>(asig,HttpStatus.OK);
+			return new ResponseEntity<Asignatura>(asig,HttpStatus.OK);}
+			}
+			
+			
 		}
 
 	}  // ----------------------------------------------------------------------------------------------------------------------
