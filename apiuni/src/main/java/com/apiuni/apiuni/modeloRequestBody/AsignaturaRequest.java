@@ -1,4 +1,4 @@
-package com.apiuni.apiuni.modelo;
+package com.apiuni.apiuni.modeloRequestBody;
 
 import javax.validation.constraints.Min;
 

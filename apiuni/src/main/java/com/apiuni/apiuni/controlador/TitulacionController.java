@@ -13,13 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.apiuni.apiuni.modelo.Asignatura;
-import com.apiuni.apiuni.modelo.Departamento;
 import com.apiuni.apiuni.modelo.ErrorObject400;
 import com.apiuni.apiuni.modelo.ErrorObject404;
 import com.apiuni.apiuni.modelo.ErrorObject409;
-import com.apiuni.apiuni.modelo.Profesor;
 import com.apiuni.apiuni.modelo.Titulacion;
-import com.apiuni.apiuni.modelo.TitulacionRequest;
+import com.apiuni.apiuni.modeloRequestBody.TitulacionRequest;
 import com.apiuni.apiuni.servicio.AsignaturaService;
 import com.apiuni.apiuni.servicio.TitulacionService;
 import com.fasterxml.jackson.core.JsonProcessingException;

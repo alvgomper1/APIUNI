@@ -1,12 +1,6 @@
 package com.apiuni.apiuni.controlador;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import javax.validation.Valid;
-
-import org.aspectj.weaver.patterns.AbstractSignaturePattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,15 +14,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.apiuni.apiuni.modelo.Alumno;
-import com.apiuni.apiuni.modelo.AlumnoRequest;
 import com.apiuni.apiuni.modelo.Asignatura;
-import com.apiuni.apiuni.modelo.AsignaturaRequest;
-import com.apiuni.apiuni.modelo.Departamento;
 import com.apiuni.apiuni.modelo.ErrorObject400;
 import com.apiuni.apiuni.modelo.ErrorObject404;
 import com.apiuni.apiuni.modelo.ErrorObject409;
-import com.apiuni.apiuni.modelo.Profesor;
-import com.apiuni.apiuni.modelo.Titulacion;
+import com.apiuni.apiuni.modeloRequestBody.AlumnoRequest;
+import com.apiuni.apiuni.modeloRequestBody.AsignaturaRequest;
 import com.apiuni.apiuni.servicio.AlumnoService;
 import com.apiuni.apiuni.servicio.AsignaturaService;
 import com.apiuni.apiuni.servicio.DepartamentoService;

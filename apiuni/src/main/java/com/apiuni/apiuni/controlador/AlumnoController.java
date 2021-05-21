@@ -15,14 +15,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.apiuni.apiuni.modelo.Alumno;
-import com.apiuni.apiuni.modelo.AlumnoRequest;
-
-
 import com.apiuni.apiuni.modelo.Asignatura;
 
 import com.apiuni.apiuni.modelo.ErrorObject400;
 import com.apiuni.apiuni.modelo.ErrorObject404;
 import com.apiuni.apiuni.modelo.ErrorObject409;
+import com.apiuni.apiuni.modeloRequestBody.AlumnoRequest;
 import com.apiuni.apiuni.servicio.AlumnoService;
 import com.apiuni.apiuni.servicio.AsignaturaService;
 import com.fasterxml.jackson.core.JsonProcessingException;

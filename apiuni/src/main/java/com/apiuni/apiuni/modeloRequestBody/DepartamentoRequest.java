@@ -1,15 +1,4 @@
-package com.apiuni.apiuni.modelo;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import javax.persistence.*;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.swagger.v3.oas.annotations.Hidden;
+package com.apiuni.apiuni.modeloRequestBody;
 
 
 

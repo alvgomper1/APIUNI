@@ -1,10 +1,4 @@
-package com.apiuni.apiuni.modelo;
-
-import java.util.List;
-
-import javax.persistence.*;
-
-import io.swagger.v3.oas.annotations.Hidden;
+package com.apiuni.apiuni.modeloRequestBody;
 
 
 public class ProfesorRequest {

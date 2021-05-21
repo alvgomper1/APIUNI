@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.apiuni.apiuni.modelo.Asignatura;
 import com.apiuni.apiuni.modelo.Departamento;
-import com.apiuni.apiuni.modelo.DepartamentoRequest;
 import com.apiuni.apiuni.modelo.ErrorObject400;
 import com.apiuni.apiuni.modelo.ErrorObject404;
 import com.apiuni.apiuni.modelo.ErrorObject409;
 import com.apiuni.apiuni.modelo.Profesor;
+import com.apiuni.apiuni.modeloRequestBody.DepartamentoRequest;
 import com.apiuni.apiuni.servicio.AsignaturaService;
 import com.apiuni.apiuni.servicio.DepartamentoService;
 import com.apiuni.apiuni.servicio.ProfesorService;
