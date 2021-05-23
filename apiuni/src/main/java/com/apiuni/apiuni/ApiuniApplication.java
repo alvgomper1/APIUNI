@@ -8,7 +8,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class ApiuniApplication {
 
 	public static void main(String[] args) {
+		
 		SpringApplication.run(ApiuniApplication.class, args);
-	}
+		 	}
 
 }

@@ -36,6 +36,31 @@ public boolean existen(List<Asignatura> asignaturas) {
 			return false;
 		}
 	}
+
+public List<Asignatura> findAllAsignaturas (){
+	return (List<Asignatura>) this.asignaturarepository.findAll();
+}
 	
+public long saveId(Asignatura d) {
+	return this.asignaturarepository.save(d).getId();
+}
+
+public boolean eliminaAsignaturaPorId(Long idAsignatura) {
+	 try{
+           this.asignaturarepository.deleteById(idAsignatura);
+           return true;
+       }catch(Exception err){
+           return false;
+       }
+}
+public void saveAll(Set<Asignatura> asignaturas) {
+	this.asignaturarepository.saveAll(asignaturas);
+}
 	
+public Asignatura findAleatorio() {
+	return this.asignaturarepository.findAleatorio();
+	
+}
+
+
 }

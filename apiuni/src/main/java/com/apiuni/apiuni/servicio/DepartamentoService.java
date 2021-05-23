@@ -27,11 +27,22 @@ public class DepartamentoService {
 	}
 	
 	public void save(Departamento d) {
+		
+		
 		this.departamentoRepository.save(d);
 	}
 	
 	public long saveId(Departamento d) {
 		return this.departamentoRepository.save(d).getId();
+	}
+	
+	public boolean eliminaDepartamentoPorId(Long idDepartamento) {
+		 try{
+	           this.departamentoRepository.deleteById(idDepartamento);
+	           return true;
+	       }catch(Exception err){
+	           return false;
+	       }
 	}
 	
 }

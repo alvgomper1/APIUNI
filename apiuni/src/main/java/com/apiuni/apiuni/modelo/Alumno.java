@@ -1,21 +1,26 @@
 package com.apiuni.apiuni.modelo;
 
-import java.util.Set;
-
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.PreRemove;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+ 
 
 @Entity
 public class Alumno {
 	
+	  
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(unique = true, nullable = false)
-	private Long id;
+	 
+	private Long id; 
 	
 	private String nombre;
 	private String apellidos;
@@ -24,9 +29,21 @@ public class Alumno {
     
     private String telefono;
     
+    @JsonIgnore()
+    @ManyToMany(mappedBy = "alumnos" ) 
+	private List<Asignatura> asignaturas;  
     
-    @ManyToMany(mappedBy = "alumnos")
-    private Set<Asignatura> asignaturas;
+    @PreRemove
+    private void removeAlumnosFromAsignatura() {
+        for (Asignatura u : asignaturas) {
+            u.getAlumnos().remove(this);
+        }
+    }
+    
+    @JsonProperty(value = "Asignaturas")
+	public List<String> getAsignaturasAlumno(){
+		return new ArrayList<>();
+	}
 
 	public Long getId() {
 		return id;
@@ -68,13 +85,8 @@ public class Alumno {
 		this.edad = edad;
 	}
 
-	public Set<Asignatura> getAsignaturas() {
-		return asignaturas;
-	}
-
-	public void setAsignaturas(Set<Asignatura> asignaturas) {
-		this.asignaturas = asignaturas;
-	}
+	
+	 
 
 	public String getTelefono() {
 		return telefono;
@@ -83,7 +95,16 @@ public class Alumno {
 	public void setTelefono(String telefono) {
 		this.telefono = telefono;
 	}
+
+	
+	public List<Asignatura> getAsignaturas() {
+		return asignaturas;
+	}
+
+	public void setAsignaturas(List<Asignatura> asignaturas) {
+		this.asignaturas = asignaturas;
+	}
     
-    
+	
 
 }

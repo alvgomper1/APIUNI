@@ -1,31 +1,44 @@
 package com.apiuni.apiuni.modelo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 
 @Entity
 public class Profesor {
-
+	 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(unique = true, nullable = false)
+	@Column(nullable = false)
 	private Long id;
 	
 	private String nombre;
     private String email;
     private String telefono;
     
+    @JsonIgnore
     @ManyToOne
     private Departamento departamento;
     
-    @ManyToMany
-	private List<Asignatura> asignaturas;
+    
+    @JsonIgnore
+    @ManyToMany(mappedBy = "profesores" ) 
+	private List<Asignatura> asignaturas;  
+    
+    @PreRemove
+    private void removeProfesoresFromAsignatura() {
+        for (Asignatura u : asignaturas) {
+            u.getProfesores().remove(this);
+        }
+    }
     
 	public Long getId() {
-		return id;
+		return id;  
 	}
 	public void setId(Long id) {
 		this.id = id;
@@ -62,6 +75,23 @@ public class Profesor {
 		this.asignaturas = asignaturas;
 	}
 
+	@Override
+	public String toString() {
+		return "Profesor [id=" + id + ", nombre=" + nombre + ", email=" + email + ", telefono=" + telefono
+				+ ", departamento=" + departamento + ", asignaturas=" + asignaturas + "]";
+	}
+
+	
+	@JsonProperty(value = "Asignaturas")
+	public List<String> getAsignaturasProfesor(){
+		return new ArrayList<>();
+	}
+	
+	
+	@JsonProperty(value = "Departamento")
+	public String getDepartamentoProfesor(){
+		return "Departamento";
+	}
     
     
     

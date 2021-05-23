@@ -18,6 +18,6 @@ public class OpenApiConfig {
     	return new OpenAPI()
                 .components(new Components())
                 .info(new Info().title("Documentacion APIUNI")
-                        .description("Documentacion de ejemplo API REST"));
+                        .description("Documentacion de ejemplo API REST con datos de la Universidad de Sevilla"));
     }
 }

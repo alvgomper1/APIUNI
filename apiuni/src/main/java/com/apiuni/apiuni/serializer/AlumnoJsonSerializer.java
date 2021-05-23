@@ -25,13 +25,9 @@ public class AlumnoJsonSerializer extends JsonSerializer<Alumno> {
 		jsonGenerator.writeStringField("nombre", alumno.getNombre().toString());
 		jsonGenerator.writeStringField("telefono", alumno.getTelefono().toString());
 		jsonGenerator.writeStringField("edad", alumno.getEdad().toString());
+		jsonGenerator.writeStringField("asignaturas", alumno.getAsignaturas().stream().map(x->x.getNombre()).collect(Collectors.toList()).toString());
 
-		if (alumno.getAsignaturas() == null) {
-			jsonGenerator.writeStringField("Asignaturas", null);
-		} else {
-			jsonGenerator.writeStringField("Asignaturas",
-					alumno.getAsignaturas().stream().map(x -> x.getNombre()).collect(Collectors.toSet()).toString());
-		}
+		
 
 		jsonGenerator.writeEndObject();
 
